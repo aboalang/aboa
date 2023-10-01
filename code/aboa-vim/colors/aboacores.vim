@@ -16,18 +16,18 @@ if exists("syntax_on")
 endif
 "
 " aboa invented names [nomes inventado]
-hi BooleanFalse     gui=NONE      guibg=NONE      guifg=#cc5544
-hi BooleanTrue      gui=NONE      guibg=NONE      guifg=#77bb55
+hi BooleanFalse     gui=NONE      guibg=NONE      guifg=#aa6644
+hi BooleanTrue      gui=NONE      guibg=NONE      guifg=#66aa44
 "
 " ViM builtin names [nomes internos]
 " NOTE: all the colors with gui=italic are those not yet decided
 "       [todos os cores com gui=italic são aquelos que ainda não foram decididos]
-hi Boolean          gui=NONE      guibg=NONE      guifg=#7755cc
-hi Character        gui=italic    guibg=NONE      guifg=#ffffff
+hi Boolean          gui=NONE      guibg=NONE      guifg=#77aaaa
+hi Character        gui=NONE      guibg=#444444   guifg=#ffdd77
 hi ColorColumn      gui=italic    guibg=NONE      guifg=#ffffff
 hi Comment          gui=NONE      guibg=NONE      guifg=#888888
 hi Conceal          gui=italic    guibg=NONE      guifg=#ffffff
-hi Constant         gui=NONE      guibg=NONE      guifg=#66aa88
+hi Constant         gui=NONE      guibg=NONE      guifg=#77aaaa
 hi Cursor           gui=NONE      guibg=#4466bb   guifg=NONE
 hi CursorColumn     gui=italic    guibg=NONE      guifg=#ffffff
 hi CursorLine       gui=italic    guibg=NONE      guifg=#ffffff
@@ -46,10 +46,10 @@ hi Error            gui=NONE      guibg=#553333   guifg=#ff7755
 hi ErrorMsg         gui=NONE      guibg=#553333   guifg=#ff7755
 hi FoldColumn       gui=italic    guibg=NONE      guifg=#ffffff
 hi Folded           gui=italic    guibg=NONE      guifg=#ffffff
-hi Identifier       gui=italic    guibg=NONE      guifg=#ffff00
+hi Identifier       gui=NONE      guibg=NONE      guifg=#ccccbb
 hi Ignore           gui=italic    guibg=NONE      guifg=#ffffff
 hi IncSearch        gui=italic    guibg=#777755   guifg=#ffff77
-hi Keyword          gui=NONE      guibg=NONE      guifg=#55bb77
+hi Keyword          gui=NONE      guibg=NONE      guifg=#dd9977
 hi lCursor          gui=NONE      guibg=#ccccbb   guifg=#4466bb
 hi LineNr           gui=italic    guibg=NONE      guifg=#ffffff
 hi LineNrAbove      gui=italic    guibg=NONE      guifg=#ffffff
@@ -59,8 +59,8 @@ hi MatchParen       gui=bold      guibg=NONE      guifg=#ffee00
 hi ModeMsg          gui=italic    guibg=NONE      guifg=#ffffff
 hi MoreMsg          gui=bold      guibg=NONE      guifg=#aa77ff
 hi NonText          gui=italic    guibg=NONE      guifg=#7777ff
-hi Normal           gui=NONE      guibg=#333333   guifg=#ccccbb
-hi Number           gui=NONE      guibg=NONE      guifg=#dd9977
+hi Normal           gui=NONE      guibg=#333333   guifg=#aaaaaa
+hi Number           gui=NONE      guibg=NONE      guifg=#77aa88
 hi Question         gui=italic    guibg=NONE      guifg=#ffffff
 hi QuickFixLine     gui=italic    guibg=NONE      guifg=#ffffff
 hi Pmenu            gui=italic    guibg=NONE      guifg=#00ff00
@@ -70,7 +70,7 @@ hi PmenuThumb       gui=italic    guibg=NONE      guifg=#00ffff
 hi PreProc          gui=italic    guibg=NONE      guifg=#ff00ff
 hi Search           gui=NONE      guibg=#777755   guifg=#ffffff
 hi SignColumn       gui=italic    guibg=NONE      guifg=#ffffff
-hi Special          gui=italic    guibg=NONE      guifg=#ffffff
+hi Special          gui=NONE      guibg=NONE      guifg=#ddaa55
 hi SpecialChar      gui=italic    guibg=NONE      guifg=#ffffff
 hi SpecialKey       gui=italic    guibg=NONE      guifg=#ffffff
 hi SpellBad         gui=italic    guibg=NONE      guifg=#ff0000
@@ -87,7 +87,7 @@ hi TabLine          gui=italic    guibg=NONE      guifg=#ffffff
 hi TabLineFill      gui=italic    guibg=NONE      guifg=#ffffff
 hi TabLineSel       gui=italic    guibg=NONE      guifg=#ffffff
 hi Title            gui=italic    guibg=NONE      guifg=#ffffff
-hi Todo             gui=bold      guibg=#333333   guifg=#cc88aa
+hi Todo             gui=bold      guibg=#333333   guifg=#cc8899
 hi ToolbarLine      gui=italic    guibg=#777777   guifg=#ffffff
 hi ToolbarButton    gui=italic    guibg=#ffffff   guifg=#000000
 hi Type             gui=italic    guibg=NONE      guifg=#ffffff
