@@ -22,6 +22,24 @@ new ideas into an alloy of surpassing quality.
 - Code generation
 - Packaging
 
+## syntax WIP
+
+Aboa syntax is a work-in-progress, currently based on Scheme RSR7,
+with the following changes and additions (* indicates not supported in Scheme):
+
+```scheme
+  Aboa  Scheme   semantics     notes
+
+    #   ;        comment
+    ~   define   *immutable    may become only for functions instead of vals, purity is not yet enforced
+    !   define   mutable       may become only for procedures instead of vars
+    ^   lambda   *function     purity is not yet enforced
+    &   lambda   procedure
+    @   let      block scope   may become only for funcs/procs or be eliminated
+    ?   if       conditional   may become generalized with Scheme "cond"
+
+```
+
 ## notable features
 
 - Functional programming paradigm only; no object-orientation.
@@ -80,4 +98,4 @@ or [Racket](https://github.com/aboalang/racket)
 
 - [aboa-vim](code/aboa-vim) ViM configuration for the aboa syntax and color scheme
 
-## TODO: more to be written, by c4augustus, as of 2023.10.01
+## TODO: more to be written, by c4augustus, as of 2023.10.02
