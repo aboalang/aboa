@@ -32,31 +32,37 @@ with the following changes and additions (* indicates not supported in Scheme):
 
     #   ;           comment
     ^   define ( )  *function         purity is not yet enforced but will be eventually
-    &   define ( )  procedure         followed by a name or _, without enclosing ( )
+    <   define ( )  procedure         followed by a name or _, without enclosing ( )
+    (f  (f          func applic       "f" is placeholder for actual defined name, same as Scheme
+    (>f (f          *proc applic      symbol name prefix is required to apply defined procedures
     _   lambda      lambda func/proc  in place of name defines a lambda, i.e. anonymous function
     ?   if          conditional       may become generalized with Scheme "cond"
 
     ~   define      *immutable val    may be eliminated if values are replaced with functions
     !   define      mutable var       may be eliminated if mutable state is prohibited
-    @   let         block scope       may be eliminated if global scope is eliminated
+    &   let         block scope       may be eliminated if global scope is eliminated
     :   :           **type            *only found in Chicken Scheme and Racket
     %               **prim type       e.g. % int, .% float, etc.
+
+    <<  <           less than         so it's 2 characters long like <=
+    >>  >           greater than      so it's 2 characters long like >=
+    ==  =           equal             so it's 2 characters long like !=
 
 ```
 ### example:
 
 ```scheme
-(& aleatório-le max (random (- max (random max))))
-
 (^ iota1 conta (map (^ _ x (+ 1 x)) (iota conta)))
 
 (^ vetor-3d:.% x:.% y:.% z:.% (vector x y z))
 
-(& vetor-3d-aleatório mag
-  (vector (aleatório-le mag) (aleatório-le mag) (aleatório-le mag)))
-
 (^ vetor-adição v1 v2
   (vector-map (^ _ e1 e2 (+ e1 e2)) v1 v2))
+
+(< aleatório-le max (random (- max (random max))))
+
+(< vetor-3d-aleatório mag
+  (vector (>aleatório-le mag) (>aleatório-le mag) (>aleatório-le mag)))
 
 ```
 
@@ -93,8 +99,8 @@ with the following changes and additions (* indicates not supported in Scheme):
 ## distinquishing (possibly unique?) features
 
 - Enforcement between **functions** that have no side-effects (declared by
-  "(. (name ...))") and **procedures** that have side-effects (declared by
-  "(! (name ...))", called by "(!name ...)).
+  "(^ name ...)" or (^ _ ...) for lambda) and **procedures** that have
+  side-effects (declared by "(! name ...))" and called by "(!name ...)).
 
 - No English words predefined by the syntax and no bias to English.
 
