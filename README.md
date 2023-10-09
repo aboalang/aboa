@@ -24,19 +24,39 @@ new ideas into an alloy of surpassing quality.
 
 ## syntax WIP
 
-Aboa syntax is a work-in-progress, currently based on Scheme RSR7,
+Aboa syntax is a work-in-progress, currently based on Scheme R7RS,
 with the following changes and additions (* indicates not supported in Scheme):
 
 ```scheme
-  Aboa  Scheme   semantics     notes
+  Aboa  Scheme      semantics         notes
 
-    #   ;        comment
-    ~   define   *immutable    may become only for functions instead of vals, purity is not yet enforced
-    !   define   mutable       may become only for procedures instead of vars
-    ^   lambda   *function     purity is not yet enforced
-    &   lambda   procedure
-    @   let      block scope   may become only for funcs/procs or be eliminated
-    ?   if       conditional   may become generalized with Scheme "cond"
+    #   ;           comment
+    ^   define ( )  *function         purity is not yet enforced but will be eventually
+    &   define ( )  procedure         followed by a name or _, without enclosing ( )
+    _   lambda      lambda func/proc  in place of name defines a lambda, i.e. anonymous function
+    ?   if          conditional       may become generalized with Scheme "cond"
+
+    ~   define      *immutable val    may be eliminated if values are replaced with functions
+    !   define      mutable var       may be eliminated if mutable state is prohibited
+    @   let         block scope       may be eliminated if global scope is eliminated
+    :   :           **type            *only found in Chicken Scheme and Racket
+    %               **prim type       e.g. % int, .% float, etc.
+
+```
+### example:
+
+```scheme
+(& aleatório-le max (random (- max (random max))))
+
+(^ iota1 conta (map (^ _ x (+ 1 x)) (iota conta)))
+
+(^ vetor-3d:.% x:.% y:.% z:.% (vector x y z))
+
+(& vetor-3d-aleatório mag
+  (vector (aleatório-le mag) (aleatório-le mag) (aleatório-le mag)))
+
+(^ vetor-adição v1 v2
+  (vector-map (^ _ e1 e2 (+ e1 e2)) v1 v2))
 
 ```
 
@@ -72,11 +92,11 @@ with the following changes and additions (* indicates not supported in Scheme):
 
 ## distinquishing (possibly unique?) features
 
-- No English words predefined by the syntax and no bias to English.
-
 - Enforcement between **functions** that have no side-effects (declared by
   "(. (name ...))") and **procedures** that have side-effects (declared by
   "(! (name ...))", called by "(!name ...)).
+
+- No English words predefined by the syntax and no bias to English.
 
 ## implementations - all support identical syntax:
 
@@ -98,4 +118,4 @@ or [Racket](https://github.com/aboalang/racket)
 
 - [aboa-vim](code/aboa-vim) ViM configuration for the aboa syntax and color scheme
 
-## TODO: more to be written, by c4augustus, as of 2023.10.02
+## TODO: more to be written, by c4augustus, as of 2023.10.09
