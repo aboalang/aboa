@@ -7,7 +7,7 @@ new ideas into an alloy of surpassing quality.
 ## priorities (... inspired by)
 
 1. Interactive ... APL, Lisp
-2. Beautiful ... APL, Lisp
+2. Beautiful ... Lisp, Uiua
 3. Ubiquitous ... C, Python
 4. Uncompromising ... Haskell, Rust
 5. Minimal ... Erlang, Scheme
@@ -100,7 +100,7 @@ with the following changes and additions (* indicates not supported in Scheme):
 
 - Enforcement between **functions** that have no side-effects (declared by
   "(^ name ...)" or (^ _ ...) for lambda) and **procedures** that have
-  side-effects (declared by "(! name ...))" and called by "(!name ...)).
+  side-effects (declared by "(< name ...))" and called by "(>name ...)).
 
 - No English words predefined by the syntax and no bias to English.
 
