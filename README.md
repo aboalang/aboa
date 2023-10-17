@@ -1,12 +1,12 @@
 # aboa
 
-Aboa ("a good" in Portuguese) is a programming language that melds
+Aboa ("the good" in Portuguese) is a programming language that melds
 the best aspects of other programming languages together with a few
 new ideas into an alloy of surpassing quality.
 
 ## priorities (... inspired by)
 
-1. Interactive ... APL, Lisp
+1. Interactive ... APL, Smalltalk
 2. Beautiful ... Lisp, Uiua
 3. Ubiquitous ... C, Python
 4. Uncompromising ... Haskell, Rust
@@ -42,7 +42,7 @@ with the following changes and additions (* indicates not supported in Scheme):
     !   define      mutable var       may be eliminated if mutable state is prohibited
     &   let         block scope       may be eliminated if global scope is eliminated
     :   :           **type            *only found in Chicken Scheme and Racket
-    %               **prim type       e.g. % int, .% float, etc.
+    %               **prim type       e.g. % int, .% float, "" string, etc.
 
     <<  <           less than         so it's 2 characters long like <=
     >>  >           greater than      so it's 2 characters long like >=
@@ -94,7 +94,7 @@ with the following changes and additions (* indicates not supported in Scheme):
 
 - No package management or pre-built distribution. Reuse is assumed
   to be achieved by inclusion of other sources, however they are
-  acquired (e.g. git, tarball) and arranged (e.g. copied, symlinked).
+  acquired (e.g. git, tarball) and arranged (e.g. copied, symlinked, submodule).
 
 ## distinquishing (possibly unique?) features
 
