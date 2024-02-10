@@ -1,0 +1,2 @@
+#!/bin/sh
+gcc -o aboa aboa-s7-repl.c aboa-s7.c
