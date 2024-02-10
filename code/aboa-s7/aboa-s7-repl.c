@@ -8,7 +8,7 @@
   #include <unistd.h>
 #endif
 
-#include "s7.h"
+#include "aboa-s7.h" // [c4augustus]
 
 #ifndef _MSC_VER
 static char *realdir(s7_scheme *sc, const char *filename)
