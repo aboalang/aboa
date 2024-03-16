@@ -46,23 +46,24 @@ but now deviating quite far away from Lisps, with the following differences):
     a single pass during interpretation.
 
 ```scheme
-    aboa        Scheme              semantics
+    aboa        Scheme            semantics
 
     #           ;                 comment
-    @           ()                empty list value
-    ,           '()               diadic catenate L to R
+    _           argname           expression input argument reference, single list in aboa, one or more in Scheme
+    _n          argname           nth list element of input argument reference
+    []          ()                empty list value
+    ~           '()               diadic catenate L to R
     (...)       (...)             bounds of expression list, evaluated immediately, left to right
+    ^(...)                        anon function definition (pure) that is not evaluated until called
+    >(...)      (lambda ...)      anon procedure definition (effectful) that is not evaluated until called
     name(                         beginning of named expression that serves as comment or point of reference
     )name                         end of named expression, required when its beginning is named
     name^(...                     function definition (pure) that is not evaluated until called
     name>(...   define (name ...  procedure definition (effectful) that is not evaluated until called
-    ^(...)                        anon function definition (pure) that is not evaluated until called
-    >(...)      (^ ...)           anon procedure definition (effectful) that is not evaluated until called
     ^name                         function application, its one argument comes from its left
     >name       (p ...)           procedure application, in aboa its one argument comes from its left
     _           argname           argument reference, single list in aboa, one or more in Scheme
-    _@n         argname           nth list element argument reference
-    !)          (p ...)           tail recursion to beginning of expression
+    <)          (p ...)           tail recursion to beginning of func/proc
 
     $                             standard library name prefix
     ~                             binary concatenation operator
