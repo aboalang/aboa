@@ -14,10 +14,21 @@
    (read-syntax #f in)))
 
 (provide read-syntax)
-(define (read-syntax src in)
-  (with-syntax ([str (port->string in)])
+(define (read-syntax src-path in)
+  (with-syntax ([src-lines (port->string in)])
     (strip-context
-     #'(module algoaboa "aboa.rkt" str))))
+     #`(module algoaboa racket
+        ;
+        ;
+        (#%datum . src-lines)
+        ;(display 'str)
+        ;(display "FUCK OFF\n")
+        ))))
+  ;(define src-lines (port->lines in))
+  ;(define src-datums (map (^ (x) (quote x)) src-lines))
+  ;(define module-datum `(module algoaboa racket
+  ;                        ,@src-datums))
+  ;(datum->syntax #f module-datum))
 
 (provide (except-out (all-from-out racket) #%module-begin)
          (rename-out (aboa-module-begin #%module-begin)))
