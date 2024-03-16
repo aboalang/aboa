@@ -24,37 +24,79 @@ new ideas into an alloy of surpassing quality.
 
 ## syntax WIP
 
-Aboa syntax is a work-in-progress, currently based on Scheme R7RS,
-with the following changes and additions (* indicates not supported in Scheme):
+Aboa syntax is a work-in-progress, previously based on Scheme R7RS,
+but now deviating quite far away from Lisps, with the following differences):
+
+1.  Like Scheme, there are only expressions, no statements whatsoever.
+    The topmost level is a single expression that contains 0 or more
+    nested expressions within.
+
+2.  Unlike Scheme, not all expressions must be bounded by lists (...).
+
+3.  Also unlike Scheme, every expression is essentially a function that
+    takes one argument which is always a list of 0 (empty), 1, or more values,
+    and produces a single list of 0, 1, or more values.
+
+4.  Even more unlike Scheme--and most other languages--expressions
+    and their values within are evaluated from left to right, top to bottom,
+    one after the other in a pipe-like sequence, the result of each previous
+    expression becoming the argument to the next expression to its right, or
+    below on the left side of the next line. Thus nested expressions, are
+    neither evaluated nor executed until they are encountered. This supports
+    a single pass during interpretation.
 
 ```scheme
-  Aboa  Scheme      semantics         notes
+    aboa        Scheme              semantics
 
-    #   ;           comment
-    ^   define ( )  *function         purity is not yet enforced but will be eventually
-    <   define ( )  procedure         followed by a name or _, without enclosing ( )
-    (f  (f          func applic       "f" is placeholder for actual defined name, same as Scheme
-    (>f (f          *proc applic      symbol name prefix is required to apply defined procedures
-    _   lambda      lambda func/proc  in place of name defines a lambda, i.e. anonymous function
-    ?   if          conditional       may become generalized with Scheme "cond"
+    #           ;                 comment
+    @           ()                empty list value
+    ,           '()               diadic catenate L to R
+    (...)       (...)             bounds of expression list, evaluated immediately, left to right
+    name(                         beginning of named expression that serves as comment or point of reference
+    )name                         end of named expression, required when its beginning is named
+    name^(...                     function definition (pure) that is not evaluated until called
+    name>(...   define (name ...  procedure definition (effectful) that is not evaluated until called
+    ^(...)                        anon function definition (pure) that is not evaluated until called
+    >(...)      (^ ...)           anon procedure definition (effectful) that is not evaluated until called
+    ^name                         function application, its one argument comes from its left
+    >name       (p ...)           procedure application, in aboa its one argument comes from its left
+    _           argname           argument reference, single list in aboa, one or more in Scheme
+    _@n         argname           nth list element argument reference
+    !)          (p ...)           tail recursion to beginning of expression
 
-    ~   define      *immutable val    may be eliminated if values are replaced with functions
-    !   define      mutable var       may be eliminated if mutable state is prohibited
-    &   let         block scope       may be eliminated if global scope is eliminated
-    :   :           **type            *only found in Chicken Scheme and Racket
-    %               **prim type       e.g. % int, .% float, "" string, etc.
+    $                             standard library name prefix
+    ~                             binary concatenation operator
 
-    <<  <           less than         so it's 2 characters long like <=
-    >>  >           greater than      so it's 2 characters long like >=
-    ==  =           equal             so it's 2 characters long like !=
+    ?           if                conditional, may become generalized with Scheme "cond"
+
+    OLD SCHEME EQUIVALENT SYNTAX:
+
+    &           let         block scope       may be eliminated if global scope is eliminated
+    :           :           **type            *only found in Chicken Scheme and Racket
+    %                       **prim type       e.g. % int, .% float, "" string, etc.
+
+    <<          <           less than         so it's 2 characters long like <=
+    >>          >           greater than      so it's 2 characters long like >=
+    ==          =           equal             so it's 2 characters long like !=
 
 ```
-### example:
+### examples:
 
 ```scheme
-(^ iota1 conta (map (^ _ x (+ 1 x)) (iota conta)))
+# Bye Bye Hello World
+!main>(_@1
+    !>(_ | ("countdown: " >$io-si)
+       $i| ("Invalid countdown "~_~", try again...\n" >$io-so @ !))
+    ("World, Hello..." >$io-so _)
+    >$iter (_-_i~"..." >$io-so 1 >$cc-sleep)
+    "Bye Bye.\n"       >$io-so
+    )main
+```
 
-(^ vetor-3d:.% x:.% y:.% z:.% (vector x y z))
+```scheme
+iota1^(_ $iota ^(_ + 1)) $iter )
+
+(^ vetor-3d:.% x:.% y:.% z:.% ($vector x y z))
 
 (^ vetor-adição v1 v2
   (vector-map (^ _ e1 e2 (+ e1 e2)) v1 v2))
