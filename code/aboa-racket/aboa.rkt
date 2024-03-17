@@ -16,11 +16,50 @@
 (define (aboa-read in) (syntax->datum (aboa-read-syntax #f in)))
 
 (define (aboa-read-syntax src-path in)
-  (define src-string (port->string in))
+  ;(define src-string (port->string in))
   ;(display src-string)
-  (define src-datum (read (open-input-string src-string))) ; racket reader strips out comments
+  (define src-tokens (reverse (sequence-fold
+    (lambda (acc c)
+      (append
+        (match c
+          [#\newline '(en)]
+          [#\return  '(en)]
+          [_   #:when     (eq? (car acc) 'co) '()]
+          [#\" #:when (or (eq? (car acc) 'sl)
+                          (and (list? (car acc))
+                               (eq? (caar acc) 's))) '(sr)]
+          [#\" '(sl)]
+          [c   #:when (or (eq? (car acc) 'sl)
+                          (and (list? (car acc))
+                               (eq? (caar acc) 's))) `((s ,c))]
+          [#\_ '(ag)]
+          [#\[ '(al)]
+          [#\] #:when     (eq? (car acc) 'al) '(ae)]
+          [#\] '(ar)]
+          [#\; '(co)]
+          [#\~ '(ca)]
+          [#\. #:when     (eq? (car acc) 'dt) '(rn)]
+          [#\. '(dt)]
+          [#\( '(el)]
+          [#\= '(eq)]
+          [#\) '(er)]
+          [#\! '(fl)]
+          [#\^ '(fu)]
+          [#\? '(if)]
+          [#\& '(it)]
+          [#\> '(pr)]
+          [#\< '(re)]
+          [#\$ '(sd)]
+          [#\% '(ty)]
+          [_   #:when (char-whitespace? c) '()]
+          [_   `((c ,c))])
+        acc))
+    '() ; initial acc
+    (in-input-port-chars in))))
+  (fprintf (current-output-port) "~s" src-tokens)
+  ;(define src-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
   ;(fprintf (current-output-port) "~a" src-datum)
-  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-datum)))
+  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-tokens)))
   (datum->syntax #f module-datum))
 
 ;; EXPANDER
@@ -28,10 +67,8 @@
 (provide (except-out (all-from-out racket) read read-syntax #%module-begin)
          (rename-out (aboa-module-begin #%module-begin)))
 (define-syntax (aboa-module-begin form)
-  ;;(display form)
   (syntax-case form ()
     [(#%module-begin:id body)
-      ;;#'(#%plain-module-begin (display body))]
       #'(#%plain-module-begin body)]
     [else
       (raise-syntax-error 'aboa-module-begin
