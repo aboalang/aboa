@@ -6,20 +6,26 @@
 ;;; License, v. 2.0. If a copy of the MPL was not distributed with this
 ;;; file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;;;
-(require syntax/strip-context)
 
-(provide read)
-(define (read in)
-  (syntax->datum
-   (read-syntax #f in)))
+;; READER
 
-(provide read-syntax)
-(define (read-syntax src in)
-  (with-syntax ([str (port->string in)])
-    (strip-context
-     #'(module algoaboa "aboa.rkt" str))))
+(provide (rename-out
+  [aboa-read read]
+  [aboa-read-syntax read-syntax]))
 
-(provide (except-out (all-from-out racket) #%module-begin)
+(define (aboa-read in) (syntax->datum (aboa-read-syntax #f in)))
+
+(define (aboa-read-syntax src-path in)
+  (define src-string (port->string in))
+  ;(display src-string)
+  (define src-datum (read (open-input-string src-string))) ; racket reader strips out comments
+  ;(fprintf (current-output-port) "~a" src-datum)
+  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-datum)))
+  (datum->syntax #f module-datum))
+
+;; EXPANDER
+
+(provide (except-out (all-from-out racket) read read-syntax #%module-begin)
          (rename-out (aboa-module-begin #%module-begin)))
 (define-syntax (aboa-module-begin form)
   ;;(display form)
@@ -31,3 +37,6 @@
       (raise-syntax-error 'aboa-module-begin
         "#lang reader \"aboa.rkt\" did not provide (#%module-begin ...)"
         (syntax->datum form))]))
+
+(provide aboa)
+(define (aboa x) (fprintf (current-output-port) "~s\n" x))
