@@ -9,6 +9,8 @@
 
 ;; READER
 
+(require parser-tools/lex)
+
 (provide (rename-out
   [aboa-read read]
   [aboa-read-syntax read-syntax]))
@@ -16,9 +18,29 @@
 (define (aboa-read in) (syntax->datum (aboa-read-syntax #f in)))
 
 (define (aboa-read-syntax src-path in)
-  (define src-string (port->string in))
+  ;(define src-string (port->string in))
   ;(display src-string)
-  (define src-datum (read (open-input-string src-string))) ; racket reader strips out comments
+  (sequence-fold
+    (lambda (acc c) (
+      (let ([(prev (list-tail (length acc))])
+        (match c
+          [#\return '()]
+          [#\newline 'eol]
+          [_ (if (prev == 'comment) '()
+                (match c
+                  [#; 'comment]
+                  [_  'something
+                  ]
+                )
+              )
+          ]
+        )
+      )
+    )
+    '()
+    (in-input-port-chars in)
+
+  ;(define src-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
   ;(fprintf (current-output-port) "~a" src-datum)
   (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-datum)))
   (datum->syntax #f module-datum))
@@ -28,10 +50,8 @@
 (provide (except-out (all-from-out racket) read read-syntax #%module-begin)
          (rename-out (aboa-module-begin #%module-begin)))
 (define-syntax (aboa-module-begin form)
-  ;;(display form)
   (syntax-case form ()
     [(#%module-begin:id body)
-      ;;#'(#%plain-module-begin (display body))]
       #'(#%plain-module-begin body)]
     [else
       (raise-syntax-error 'aboa-module-begin
