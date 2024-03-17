@@ -17,8 +17,10 @@
 
 (define (aboa-read-syntax src-path in)
   (define src-string (port->string in))
-  (define src-datum (read (open-input-string src-string)))
-  (define module-datum `(module algoaboa racket ,src-datum))
+  ;(display src-string)
+  (define src-datum (read (open-input-string src-string))) ; racket reader strips out comments
+  ;(fprintf (current-output-port) "~a" src-datum)
+  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-datum)))
   (datum->syntax #f module-datum))
 
 ;; EXPANDER
@@ -35,3 +37,6 @@
       (raise-syntax-error 'aboa-module-begin
         "#lang reader \"aboa.rkt\" did not provide (#%module-begin ...)"
         (syntax->datum form))]))
+
+(provide aboa)
+(define (aboa x) (fprintf (current-output-port) "~s\n" x))
