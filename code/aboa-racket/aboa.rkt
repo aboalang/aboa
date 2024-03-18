@@ -18,44 +18,32 @@
 (define (aboa-read-syntax src-path in)
   ;(define src-string (port->string in))
   ;(display src-string)
-  (define src-tokens (reverse (sequence-fold
+  (define src-tokens (reverse (car (sequence-fold
     (lambda (acc c)
-      (append
+      (list (append
         (match c
           [#\newline '(en)]
           [#\return  '(en)]
-          [_   #:when     (eq? (car acc) 'co) '()]
-          [#\" #:when (or (eq? (car acc) 'sl)
-                          (and (list? (car acc))
-                               (eq? (caar acc) 's))) '(sr)]
+          [_   #:when     (eq? (caar acc) 'co) '()]
+          [#\" #:when (or (eq? (caar acc) 'sl)
+                          (and (list? (caar acc))
+                               (eq? (caaar acc) 's))) '(sr)]
           [#\" '(sl)]
-          [c   #:when (or (eq? (car acc) 'sl)
-                          (and (list? (car acc))
-                               (eq? (caar acc) 's))) `((s ,c))]
-          [#\_ '(ag)]
-          [#\[ '(al)]
-          [#\] #:when     (eq? (car acc) 'al) '(ae)]
-          [#\] '(ar)]
-          [#\; '(co)]
-          [#\~ '(ca)]
-          [#\. #:when     (eq? (car acc) 'dt) '(rn)]
+          [c   #:when (or (eq? (caar acc) 'sl)
+                          (and (list? (caar acc))
+                               (eq? (caaar acc) 's))) `((s ,c))]
+          [#\] #:when     (eq? (caar acc) 'al) '(ae)]
+          [#\. #:when     (eq? (caar acc) 'dt) '(rn)]
           [#\. '(dt)]
-          [#\( '(el)]
-          [#\= '(eq)]
-          [#\) '(er)]
-          [#\! '(fl)]
-          [#\^ '(fu)]
-          [#\? '(if)]
-          [#\& '(it)]
-          [#\> '(pr)]
-          [#\< '(re)]
-          [#\$ '(sd)]
-          [#\% '(ty)]
+          [#\_ '(ag)] [#\[ '(al)] [#\] '(ar)] [#\; '(co)]
+          [#\~ '(ca)] [#\( '(el)] [#\= '(eq)] [#\) '(er)]
+          [#\! '(fl)] [#\^ '(fu)] [#\? '(if)] [#\& '(it)]
+          [#\> '(pr)] [#\< '(re)] [#\$ '(sd)] [#\% '(ty)]
           [_   #:when (char-whitespace? c) '()]
           [_   `((c ,c))])
-        acc))
-    '() ; initial acc
-    (in-input-port-chars in))))
+        (car acc) '())))
+    '(() ()) ; initial acc
+    (in-input-port-chars in)))))
   (fprintf (current-output-port) "~s" src-tokens)
   ;(define src-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
   ;(fprintf (current-output-port) "~a" src-datum)
