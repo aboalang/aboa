@@ -22,36 +22,41 @@
     (lambda (acc c)
       (append
         (match c
-          [#\newline (list 'eol)]
-          [#\return  (list 'eol)]
-          [_   #:when     (eq? (car acc) 'com) '()]
-          [#\" #:when (or (eq? (car acc) 'stl)
+          [#\newline '(el)]
+          [#\return  '(el)]
+          [_   #:when     (eq? (car acc) 'co) '()]
+          [#\" #:when (or (eq? (car acc) 'sl)
                           (and (list? (car acc))
-                               (eq? (caar acc) 's))) (list 'str)]
-          [#\" (list 'stl)]
-          [_   #:when (or (eq? (car acc) 'stl)
+                               (eq? (caar acc) 's))) '(sr)]
+          [#\" '(sl)]
+          [c   #:when (or (eq? (car acc) 'sl)
                           (and (list? (car acc))
-                               (eq? (caar acc) 's))) (list (list 's `,c))]
-          [#\_ (list 'arg)]
-          [#\; (list 'com)]
-          [#\~ (list 'cat)]
-          [#\. (list 'dot)]
-          [#\( (list 'exl)]
-          [#\) (list 'exr)]
-          [#\! (list 'fai)]
-          [#\^ (list 'fun)]
-          [#\? (list 'iff)]
-          [#\& (list 'ite)]
-          [#\> (list 'pro)]
-          [#\< (list 'rec)]
-          [#\$ (list 'std)]
-          [#\% (list 'typ)]
+                               (eq? (caar acc) 's))) `((s ,c))]
+          [#\_ '(ag)]
+          [#\[ '(al)]
+          [#\] #:when     (eq? (car acc) 'al) '(ae)]
+          [#\] '(ar)]
+          [#\; '(co)]
+          [#\~ '(ca)]
+          [#\. #:when     (eq? (car acc) 'dt) '(rn)]
+          [#\. '(dt)]
+          [#\( '(el)]
+          [#\= '(eq)]
+          [#\) '(er)]
+          [#\! '(fl)]
+          [#\^ '(fu)]
+          [#\? '(if)]
+          [#\& '(it)]
+          [#\> '(pr)]
+          [#\< '(re)]
+          [#\$ '(sd)]
+          [#\% '(ty)]
           [_   #:when (char-whitespace? c) '()]
-          [_   (list (list 'c `,c))])
+          [_   `((c ,c))])
         acc))
     '() ; initial acc
     (in-input-port-chars in))))
-  (fprintf (current-output-port) "~a" src-tokens)
+  (fprintf (current-output-port) "~s" src-tokens)
   ;(define src-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
   ;(fprintf (current-output-port) "~a" src-datum)
   (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-tokens)))
