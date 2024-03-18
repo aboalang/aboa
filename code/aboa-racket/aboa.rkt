@@ -9,8 +9,6 @@
 
 ;; READER
 
-(require parser-tools/lex)
-
 (provide (rename-out
   [aboa-read read]
   [aboa-read-syntax read-syntax]))
@@ -20,29 +18,43 @@
 (define (aboa-read-syntax src-path in)
   ;(define src-string (port->string in))
   ;(display src-string)
-  (sequence-fold
-    (lambda (acc c) (
-      (let ([(prev (list-tail (length acc))])
+  (define src-tokens (reverse (sequence-fold
+    (lambda (acc c)
+      (append
         (match c
-          [#\return '()]
-          [#\newline 'eol]
-          [_ (if (prev == 'comment) '()
-                (match c
-                  [#; 'comment]
-                  [_  'something
-                  ]
-                )
-              )
-          ]
-        )
-      )
-    )
-    '()
-    (in-input-port-chars in)
-
+          [#\newline (list 'eol)]
+          [#\return  (list 'eol)]
+          [_   #:when     (eq? (car acc) 'com) '()]
+          [#\" #:when (or (eq? (car acc) 'stl)
+                          (and (list? (car acc))
+                               (eq? (caar acc) 's))) (list 'str)]
+          [#\" (list 'stl)]
+          [_   #:when (or (eq? (car acc) 'stl)
+                          (and (list? (car acc))
+                               (eq? (caar acc) 's))) (list (list 's `,c))]
+          [#\_ (list 'arg)]
+          [#\; (list 'com)]
+          [#\~ (list 'cat)]
+          [#\. (list 'dot)]
+          [#\( (list 'exl)]
+          [#\) (list 'exr)]
+          [#\! (list 'fai)]
+          [#\^ (list 'fun)]
+          [#\? (list 'iff)]
+          [#\& (list 'ite)]
+          [#\> (list 'pro)]
+          [#\< (list 'rec)]
+          [#\$ (list 'std)]
+          [#\% (list 'typ)]
+          [_   #:when (char-whitespace? c) '()]
+          [_   (list (list 'c `,c))])
+        acc))
+    '() ; initial acc
+    (in-input-port-chars in))))
+  (fprintf (current-output-port) "~a" src-tokens)
   ;(define src-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
   ;(fprintf (current-output-port) "~a" src-datum)
-  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-datum)))
+  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-tokens)))
   (datum->syntax #f module-datum))
 
 ;; EXPANDER
