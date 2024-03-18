@@ -22,8 +22,8 @@
     (lambda (acc c)
       (append
         (match c
-          [#\newline '(el)]
-          [#\return  '(el)]
+          [#\newline '(en)]
+          [#\return  '(en)]
           [_   #:when     (eq? (car acc) 'co) '()]
           [#\" #:when (or (eq? (car acc) 'sl)
                           (and (list? (car acc))

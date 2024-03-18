@@ -6,13 +6,13 @@
 ;   License, v. 2.0. If a copy of the MPL was not distributed with this
 ;   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-(
+
 >(=[] ? ("countdown: " >$io.si) _
   %i ! ("Invalid countdown "~_~", try again...\n" >$io.sof [] <))
 ("World, Hello..." >$io.sof _)
 ..0 & (_1~"..." >$io.sof 1 >$cc.sleep)
 "Bye Bye.\n" >$io.sof
-)
+
 ;   L               F               R             operation
 
 ;   arglist         >               (             dyadic execute proc begin
