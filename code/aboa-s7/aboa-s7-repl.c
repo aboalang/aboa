@@ -18,6 +18,7 @@ static char *realdir(s7_scheme *sc, const char *filename)
 
   if (!strchr(filename, '/'))
     {
+#if 0 // TODO: @@@ DISABLED USING libc_s7
       if (access("libc_s7.so", F_OK) != 0)
 	{
 	  if ((access("libc.scm", F_OK) == 0) &&
@@ -30,6 +31,7 @@ static char *realdir(s7_scheme *sc, const char *filename)
 	  fprintf(stderr, "%s needs libc_s7.so (give the explicit repl pathname or build it by running: repl libc.scm)\n", filename); /* env PATH=/home/bil/cl repl */
 	  exit(2);
 	}
+#endif
       return(NULL);  /* we're in the libc_s7.so directory, I hope (user could start a version of s7 that does not match the local libc_s7.so...) */
     }
   if (!(path = realpath(filename, NULL)))
