@@ -96194,7 +96194,11 @@ void s7_repl(s7_scheme *sc)
   s7_pointer e = s7_inlet(sc, set_clist_2(sc, make_symbol(sc, "init_func", 9), make_symbol(sc, "libc_s7_init", 12)));
   s7_int gc_loc = s7_gc_protect(sc, e);
   s7_pointer old_e = s7_set_curlet(sc, e);   /* e is now (curlet) so loaded names from libc will be placed there, not in (rootlet) */
+#if 0 // TODO: @@@ DISABLED USING libc_s7
   s7_pointer val = s7_load_with_environment(sc, "libc_s7.so", e);
+#else
+  s7_pointer val = NULL;
+#endif
   if (val)
     {
       s7_pointer libs = global_slot(sc->libraries_symbol);
@@ -96202,7 +96206,6 @@ void s7_repl(s7_scheme *sc)
       s7_define(sc, sc->nil, new_symbol(sc, "*libc*", 6, hash, hash % SYMBOL_TABLE_SIZE), e);
       slot_set_value(libs, cons(sc, cons(sc, s7_make_semipermanent_string(sc, "libc.scm"), e), slot_value(libs)));
     }
-
   s7_set_curlet(sc, old_e);       /* restore incoming (curlet) */
   s7_gc_unprotect_at(sc, gc_loc);
 
