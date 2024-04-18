@@ -1,4 +1,7 @@
 #lang reader "aboa.rkt"
+# !/usr/bin/env aboa
+#:aboa-v-00-01
+# Bye Bye Hello World
 #
 #   Copyright © 2024 Christopher Augustus
 #
@@ -7,22 +10,42 @@
 #   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
->(=[] ? ("countdown: " >$io.si) _
-  %i ! ("Invalid countdown "~_~", try again...\n" >$io.sof [] <))
-("World, Hello..." >$io.sof _)
-..0 & (_1~"..." >$io.sof 1 >$cc.sleep)
+# WORDY
+
+arg-empty   ^(=[])
+ask-count   >("countdown: " >$io.si)
+str-to-int  ^(:i)
+say-invalid >("Invalid countdown "~_~", try again...\n" >$io.sof)
+get-count   >(?arg-empty ask-count ^str-to-int ! say-invalid [] <)
+say-hello   >("World, Hello..." >$io.sof _)
+say-second  >(~"..." >$io.sof 1 >$cc.sleep)
+count-down  >(..1 & >(_1 say-second))
+say-bye-bye >("Bye Bye.\n" >$io.sof)
+
+>get-count
+>say-hello
+>count-down
+>say-bye-bye
+
+# TACIT
+
+/>(,^(=[]) ? >("countdown: " >$io.si)
+  :i !  >("Invalid countdown "~_~", try again...\n" >$io.sof [] <_))
+/>("World, Hello..." >$io.sof _)
+..0 & >(_1~"..." >$io.sof 1 >$cc.sleep)
 "Bye Bye.\n" >$io.sof
 
 #   L               F               R             operation
 
-#   arglist         >               (             dyadic execute proc begin
-#   arglist         =               []            dyadic equals empty
-#   false/true      ?               ...           triadic if true
-#   []              (                             monadic eval begin (TRUE expression)
-#   []              "count..."                    monadic value
+#   arglist         /               >(            dyadic eval
+#   arglist         >(                            monadic eval proc begin
+#   arglist         ,               ^(=[])        dyadic append
+#   arglist,^(=[])  ?               >("count...   dyadic if instead
+#   arglist         >(                            monadic proc begin (0/true expression)
+#   arglist         "count..."                    monadic value
 #   "count..."      >               $io:si        dyadic execute pre proc standard input with prompt
 #   input           )                             monadic eval end
-#   arglist         _                             monadic carry (FALSE expression)
+#   arglist         _                             monadic carry (1/false expression)
 #   arglist/input   %i                            monadic convert to type integer
 #   int/fail        !               ...           dyadic on fail
 #   int,fail        (                             monadic eval begin (FAIL expression)
