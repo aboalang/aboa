@@ -51,18 +51,18 @@ but now deviating quite far away from Lisps, with the following differences:
     #           ;                 comment
     _           argname           expression input argument reference, single list in aboa, one or more in Scheme
     _n          argname           nth list element of input argument reference
-    []          ()                empty list value
+    ()          ()                empty list value
     ~           '()               dyadic catenate L to R
-    (...)       (...)             bounds of expression list, evaluated immediately, left to right
-    >( ...)     (...)             anon procedure (effectful), evaluated immediately, left to right
-    (> ...)     (lambda ...)      anon procedure (effectful) that is not evaluated until called
-    (^ ...)                       anon function (pure) that is not evaluated until called
+    (...)       (...)             bounds of expression list,  applied immediately, left to right
+    >( ...)     (...)             apply   anon procedure (effectful), left to right
+    (> ...)     (lambda ...)      declare anon procedure (effectful)
+    (^ ...)                       declare anon function  (pure)
     name(                         beginning of named expression that serves as comment or point of reference
     )name                         end of named expression, required when its beginning is named
-    name(^ ...                    function definition (pure) that is not evaluated until called
-    name(> ...  define (name ...  procedure definition (effectful) that is not evaluated until called
-    ^name                         function application, its one argument comes from its left
-    >name       (p ...)           procedure application, in aboa its one argument comes from its left
+    name(^ ...                    define named function  (pure)
+    name(> ...  define (name ...  define named procedure (effectful)
+    ^name                         apply named function, its one argument comes from its left
+    >name       (p ...)           apply named procedure, in aboa its one argument comes from its left
     _           argname           argument reference, single list in aboa, one or more in Scheme
     <)          (p ...)           tail recursion to beginning of func/proc
 
@@ -70,15 +70,16 @@ but now deviating quite far away from Lisps, with the following differences:
 
     ?           if                conditional, may become generalized with Scheme "cond"
 
+    ==          =                 equal             so it's 2 characters long like !=
+    <<          <                 less than         so it's 2 characters long like <=
+    >>          >                 greater than      so it's 2 characters long like >=
+
     OLD SCHEME EQUIVALENT SYNTAX:
 
     &           fold        block scope       may be eliminated if global scope is eliminated
     :           :           **type            *only found in Chicken Scheme and Racket
     %                       **prim type       e.g. % int, .% float, "" string, etc.
 
-    <<          <           less than         so it's 2 characters long like <=
-    >>          >           greater than      so it's 2 characters long like >=
-    ==          =           equal             so it's 2 characters long like !=
 
 ```
 ### examples:
@@ -130,10 +131,12 @@ but now deviating quite far away from Lisps, with the following differences:
 
 ## implementations - all support identical syntax:
 
-- WIP: [aboa-s7](code/aboa-s7) embeddable C
+- WIP: [aboa-s7](code/plat/s7) embeddable C
   * derived from [s7](https://github.com/aboalang/s7)
 
-- WIP: [Racket](https://github.com/aboalang/racket) [#lang](code/aboa-racket/aboa.rkt)
+- WIP: [Racket](https://github.com/aboalang/racket) [#lang](code/plat/racket/aboa.rkt)
+
+- WIP: [POSIX shell](code/plat/sh/aboa)
 
 - TODO: on the [Erlang BEAM](https://github.com/aboalang/otp)
   * plan to derive from [LFE](https://github.com/aboalang/LFE)
@@ -145,6 +148,6 @@ but now deviating quite far away from Lisps, with the following differences:
 
 ## tool support
 
-- [aboa-vim](code/aboa-vim) ViM configuration for the aboa syntax and color scheme
+- [aboa-vim](code/supp/vim) ViM configuration for the aboa syntax and color scheme
 
-## TODO: more to be written, by c4augustus, as of 2024.04.17
+## TODO: more to be written, by c4augustus, as of 2024.05.24
