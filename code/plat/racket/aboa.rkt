@@ -73,4 +73,28 @@
         (syntax->datum form))]))
 
 (provide aboa)
-(define (aboa x) (fprintf (current-output-port) "~s\n" x))
+(define (aboa tokens)
+  (fprintf (current-output-port) "~s\n" tokens)
+  (apply-all-recurse tokens (current-command-line-arguments) ""))
+
+(define (apply-all-recurse tokens arg namein)
+  (if (null? tokens)
+    '()
+    (let
+      ([m (match (car tokens)
+        [(list 'ch c) (cons arg (string-append namein (string c)))]
+        ['dt          (cons arg (string-append namein "."))]
+        ['sd          (cons arg "$")]
+        [(list 'st s) (cons s   "")]
+        [_            (cons arg "")]
+      )])
+      (let
+        ([res (car m)] [nameout (cdr m)])
+        (if (and (not (equal? namein ""))
+                      (equal? nameout ""))
+            (fprintf (current-output-port) ": ~v\n" (string->symbol namein))
+            '())
+        (if (not (eq? arg res))
+            (fprintf (current-output-port) "< ~v\n> ~v\n" arg res)
+            '())
+        (apply-all-recurse (cdr tokens) res nameout)))))
