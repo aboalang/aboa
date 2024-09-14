@@ -1,4 +1,4 @@
-#!/usr/bin/env aboa
+# !/usr/bin/env aboa
 #:aboa-v-00-01
 #
 #   Copyright © 2024 Christopher Augustus
@@ -10,4 +10,4 @@
 read  (> "aboa> "         >$io.si )
 eval  (> "evaluating: "~_ >$io.sof) # TODO: ### IMPLEMENT ME, LOLZ
 print (> "result: "~_     >$io.sof)
->loop (,^(==[]) ? >read >eval >print () <loop)
+>loop (,^(==_.) ? >read >eval >print () <loop)

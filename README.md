@@ -71,8 +71,15 @@ but now deviating quite far away from Lisps, with the following differences:
     ?           if                conditional, may become generalized with Scheme "cond"
 
     ==          =                 equal             so it's 2 characters long like !=
+    /=          !=                not equal
+    <=          <=                less than or equal
     <<          <                 less than         so it's 2 characters long like <=
+    >=          >=                greater than or equal
     >>          >                 greater than      so it's 2 characters long like >=
+
+    :i          ...->integer      dyadic convert to integer
+
+    ! ...                         on fail apply
 
     OLD SCHEME EQUIVALENT SYNTAX:
 

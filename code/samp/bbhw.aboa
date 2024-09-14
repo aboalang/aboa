@@ -1,3 +1,4 @@
+#!/usr/bin/env racket
 #lang reader "aboa.rkt"
 # !/usr/bin/env aboa
 #:aboa-v-00-01
@@ -12,16 +13,16 @@
 
 # WORDY
 
-arg-empty   ^(=[])
-ask-count   >("countdown: " >$io.si)
-str-to-int  ^(:i)
-say-invalid >("Invalid countdown "~_~", try again...\n" >$io.sof)
-get-count   >(?arg-empty ask-count ^str-to-int ! say-invalid [] <)
-say-hello   >("World, Hello..." >$io.sof _)
-say-second  >(~"..." >$io.sof 1 >$cc.sleep)
-count-down  >(..1 & >(_1 say-second))
-say-bye-bye >("Bye Bye.\n" >$io.sof)
-
+arg-empty   (^ ==())
+ask-count   (> "countdown: " >$io.si)
+str-to-int  (^ :i)
+say-invalid (> "Invalid countdown "~_~", try again...\n" >$io.sof)
+get-count   (> ,arg-empty ? ask-count ^str-to-int ! (_1 say-invalid () </))
+say-hello   (> "World, Hello..." >$io.sof _)
+say-second  (> ~"..." >$io.sof 1 >$cc.sleep)
+count-down  (> ..1 & (> _2 say-second))
+say-bye-bye (> "Bye Bye.\n" >$io.sof)
+##
 >get-count
 >say-hello
 >count-down
@@ -29,33 +30,36 @@ say-bye-bye >("Bye Bye.\n" >$io.sof)
 
 # TACIT
 
-/>(,^(=[]) ? >("countdown: " >$io.si)
-  :i !  >("Invalid countdown "~_~", try again...\n" >$io.sof [] <_))
-/>("World, Hello..." >$io.sof _)
-..0 & >(_1~"..." >$io.sof 1 >$cc.sleep)
+>(,(^==()) ? (> "countdown: " >$io.si)
+  :i ! (> "Invalid countdown "~_1~", try again...\n" >$io.sof () </))
+>("World, Hello..." >$io.sof _)
+..0 & (> _2~"..." >$io.sof 1 >$cc.sleep)
 "Bye Bye.\n" >$io.sof
+
+# GOLF
+
+o=$io.sof>(,(^==())?(>"countdown: ">$io.si):i!(>"Invalid countdown "~_1~", try again...\n" >o()</))>("World, Hello...">o_)..0&(>_2~"...">o 1>$cc.sleep)"Bye Bye.\n">o
 
 #   L               F               R             operation
 
-#   arglist         /               >(            dyadic eval
-#   arglist         >(                            monadic eval proc begin
-#   arglist         ,               ^(=[])        dyadic append
-#   arglist,^(=[])  ?               >("count...   dyadic if instead
-#   arglist         >(                            monadic proc begin (0/true expression)
+#   arglist         >(                            monadic apply anon proc begin
+#   arglist         ,               (^=())        dyadic append
+#   arglist,(^=())  ?               >("count...   dyadic if instead
+#   arglist         (>                            monadic declare anon proc begin (0/true expression)
 #   arglist         "count..."                    monadic value
-#   "count..."      >               $io:si        dyadic execute pre proc standard input with prompt
-#   input           )                             monadic eval end
+#   "count..."      >               $io:si        dyadic apply pre proc standard input with prompt
+#   input           )                             monadic declare anon proc end
 #   arglist         _                             monadic carry (1/false expression)
-#   arglist/input   %i                            monadic convert to type integer
+#   arglist/input   :i                            monadic convert to type integer
 #   int/fail        !               ...           dyadic on fail
 #   int,fail        (                             monadic eval begin (FAIL expression)
 #   int,fail        "Invalid..."                  monadic value
 #   "Invalid..."    ~               _             dyadic append carry
 #   "Invalid..x"    ~               ", try..."    dyadic append value
 #   "Inv..x..try"   >               $io.sof       dyadic execute pre proc standard output and flush
-#   "Inv..x..try"   []                            monadic empty
-#   []              <                             monadic recurse
-#   []              )                             monadic eval end (FAIL expression)
+#   "Inv..x..try"   ()                            monadic empty
+#   ()              </                            monadic recurse up one expression
+#   ()              )                             monadic eval end (FAIL expression)
 #   int             )                             monadic proc end
 #   int             (                             monadic eval begin
 #   int             "World..."                    monadic value
