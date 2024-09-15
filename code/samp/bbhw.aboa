@@ -13,20 +13,20 @@
 
 # WORDY
 
-arg-empty   (^ ==())
-ask-count   (> "countdown: " >$io.si)
-str-to-int  (^ :i)
-say-invalid (> "Invalid countdown "~_~", try again...\n" >$io.sof)
-get-count   (> ,arg-empty ? ask-count ^str-to-int ! (_1 say-invalid () </))
-say-hello   (> "World, Hello..." >$io.sof _)
-say-second  (> ~"..." >$io.sof 1 >$cc.sleep)
-count-down  (> ..1 & (> _2 say-second))
-say-bye-bye (> "Bye Bye.\n" >$io.sof)
+##arg-empty   (^ ==())
+##ask-count   (> "countdown: " >$io.si)
+##str-to-int  (^ :i)
+##say-invalid (> "Invalid countdown "~_~", try again...\n" >$io.sof)
+##get-count   (> ,arg-empty ? ask-count ^str-to-int ! (_1 say-invalid () </))
+##say-hello   (> "World, Hello..." >$io.sof _)
+##say-second  (> ~"..." >$io.sof 1 >$cc.sleep)
+##count-down  (> ..1 & (> _2 say-second))
+##say-bye-bye (> "Bye Bye.\n" >$io.sof)
 ##
->get-count
->say-hello
->count-down
->say-bye-bye
+##>get-count
+##>say-hello
+##>count-down
+##>say-bye-bye
 
 # TACIT
 
@@ -38,7 +38,7 @@ say-bye-bye (> "Bye Bye.\n" >$io.sof)
 
 # GOLF
 
-o=$io.sof>(,(^==())?(>"countdown: ">$io.si):i!(>"Invalid countdown "~_1~", try again...\n" >o()</))>("World, Hello...">o_)..0&(>_2~"...">o 1>$cc.sleep)"Bye Bye.\n">o
+##o=$io.sof>(,(^==())?(>"countdown: ">$io.si):i!(>"Invalid countdown "~_1~", try again...\n" >o()</))>("World, Hello...">o_)..0&(>_2~"...">o 1>$cc.sleep)"Bye Bye.\n">o
 
 #   L               F               R             operation
 
