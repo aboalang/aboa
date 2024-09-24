@@ -74,7 +74,7 @@
 
 (provide aboa)
 (define (aboa tokens)
-  (fprintf (current-output-port) "~s\n" tokens)
+  (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA PARSED:\n" tokens)
   (apply-all-recurse tokens (current-command-line-arguments) ""))
 
 (define (apply-all-recurse tokens arg namein)
