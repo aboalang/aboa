@@ -15,10 +15,10 @@
 
 (define (aboa-read in) (syntax->datum (aboa-read-syntax #f in)))
 
-(define (aboa-read-syntax src-path in)
-  ;(define src-string (port->string in))
-  ;(display src-string)
-  (define src-tokinhos (reverse (sequence-fold
+(define (aboa-read-syntax fonte-path in)
+  ;(define fonte-string (port->string in))
+  ;(display fonte-string)
+  (define fonte-tokinhos (reverse (sequence-fold
     (lambda (acc c)
       (append
         (match c
@@ -33,8 +33,8 @@
                           (and (list? (car acc))
                                (eq? (caar acc) 'sc))) `((sc ,c))]
           [#\] #:when     (eq? (car acc) 'al) '(ae)]
-          [#\. #:when     (eq? (car acc) 'dt) '(rn)]
-          [#\. '(dt)]
+          [#\. #:when     (eq? (car acc) 'po) '(rn)]
+          [#\. '(po)] [#\, '(ac)]
           [#\_ '(ag)] [#\[ '(al)] [#\] '(ar)] [#\# '(cm)]
           [#\~ '(ca)] [#\( '(xl)] [#\= '(eq)] [#\) '(xr)]
           [#\! '(fl)] [#\^ '(fu)] [#\? '(if)] [#\& '(it)]
@@ -44,7 +44,7 @@
         acc))
     '() ; initial acc
     (in-input-port-chars in))))
-  (define src-tokens (reverse (car (sequence-fold
+  (define fonte-tokens (reverse (car (sequence-fold
     (lambda (acc t)
       (match t
         ['sl          (list (car acc) '("")    )]
@@ -52,11 +52,11 @@
         ['sr          (list (append   (list (list 'st (caadr acc))) (car acc)))]
         [_            (list (append   (list t                     ) (car acc)))]))
     '(() ()) ; initial acc
-    src-tokinhos))))
-  ;(fprintf (current-output-port) "~s" src-tokens)
-  ;(define src-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
-  ;(fprintf (current-output-port) "~a" src-datum)
-  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',src-tokens)))
+    fonte-tokinhos))))
+  ;(fprintf (current-output-port) "~s" fonte-tokens)
+  ;(define fonte-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
+  ;(fprintf (current-output-port) "~a" fonte-datum)
+  (define module-datum `(module algoaboa "aboa.rkt" (aboa ',fonte-tokens)))
   (datum->syntax #f module-datum))
 
 ;; EXPANDER
@@ -74,16 +74,17 @@
 
 (provide aboa)
 (define (aboa tokens)
-  (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA PARSED:\n" tokens)
-  (apply-all-recurse tokens (current-command-line-arguments) ""))
+  (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA ANALISADA:\n" tokens)
+  (aval-all-recurse tokens (current-command-line-arguments) ""))
 
-(define (apply-all-recurse tokens arg namein)
+(define (aval-all-recurse tokens arg namein)
   (if (null? tokens)
     '()
     (let
       ([m (match (car tokens)
+        ['ac          (cons arg "$")]
         [(list 'ch c) (cons arg (string-append namein (string c)))]
-        ['dt          (cons arg (string-append namein "."))]
+        ['po          (cons arg (string-append namein "."))]
         ['sd          (cons arg "$")]
         [(list 'st s) (cons s   "")]
         [_            (cons arg "")]
@@ -97,4 +98,4 @@
         (if (not (eq? arg res))
             (fprintf (current-output-port) "< ~v\n> ~v\n" arg res)
             '())
-        (apply-all-recurse (cdr tokens) res nameout)))))
+        (aval-all-recurse (cdr tokens) res nameout)))))

@@ -1,6 +1,5 @@
 #!/usr/bin/env racket
 #lang reader "aboa.rkt"
-# !/usr/bin/env aboa
 #:aboa-v-00-01
 # Bye Bye Hello World
 #
@@ -43,8 +42,8 @@
 #   L               F               R             operation
 
 #   arglist         >(                            monadic apply anon proc begin
-#   arglist         ,               (^=())        dyadic append
-#   arglist,(^=())  ?               >("count...   dyadic if instead
+#   arglist         ,               (^==())       dyadic append
+#   arglist,(^==()) ?               >("count...   dyadic if instead
 #   arglist         (>                            monadic declare anon proc begin (0/true expression)
 #   arglist         "count..."                    monadic value
 #   "count..."      >               $io:si        dyadic apply pre proc standard input with prompt
