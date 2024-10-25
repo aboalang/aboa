@@ -36,7 +36,7 @@
           [#\. #:when     (eq? (car acc) 'po) '(rn)]
           [#\. '(po)] [#\, '(ac)]
           [#\_ '(ag)] [#\[ '(al)] [#\] '(ar)] [#\# '(cm)]
-          [#\~ '(ca)] [#\( '(xl)] [#\= '(eq)] [#\) '(xr)]
+          [#\~ '(ca)] [#\( '(ei)] [#\= '(eq)] [#\) '(ef)]
           [#\! '(fl)] [#\^ '(fu)] [#\? '(if)] [#\& '(it)]
           [#\> '(pr)] [#\< '(re)] [#\$ '(sd)] [#\% '(ty)]
           [_   #:when (char-whitespace? c) '()]
@@ -75,27 +75,38 @@
 (provide aboa)
 (define (aboa tokens)
   (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA ANALISADA:\n" tokens)
-  (aval-all-recurse tokens (current-command-line-arguments) ""))
+  (aval-recur tokens '() (current-command-line-arguments) "" 0 #f))
 
-(define (aval-all-recurse tokens arg namein)
+(define traçar #t)
+
+(define (aval-recur tokens env arg nomeent nivel aplicar)
   (if (null? tokens)
     '()
     (let
       ([m (match (car tokens)
-        ['ac          (cons arg "$")]
-        [(list 'ch c) (cons arg (string-append namein (string c)))]
-        ['po          (cons arg (string-append namein "."))]
+        [(list 'ch c) (cons arg (string-append nomeent (string c)))]
+        ;['ei          #:when (eq? (cadr tokens) 'pr)
+        ;                (and (list? (car acc))
+        ;                     (eq? (caar acc) 'sc))) '(sr)]
+        ['po          (cons arg (string-append nomeent "."))]
+        ;['pr          (aval-recur tokens env arg nomeent nivel #t)]
         ['sd          (cons arg "$")]
         [(list 'st s) (cons s   "")]
         [_            (cons arg "")]
       )])
       (let
-        ([res (car m)] [nameout (cdr m)])
-        (if (and (not (equal? namein ""))
-                      (equal? nameout ""))
-            (fprintf (current-output-port) ": ~v\n" (string->symbol namein))
+        ([res (car m)] [nomesaí (cdr m)])
+        (if (and (not (equal? nomeent ""))
+                      (equal? nomesaí ""))
+            (realizar (λ (env) env)
+                      env traçar "_~v_ ~v" nivel (string->symbol nomeent))
             '())
         (if (not (eq? arg res))
-            (fprintf (current-output-port) "< ~v\n> ~v\n" arg res)
+            (realizar (λ (env) env)
+                      env traçar "_~v_ ~v --> ~v" nivel arg res)
             '())
-        (aval-all-recurse (cdr tokens) res nameout)))))
+        (aval-recur (cdr tokens) env res nomesaí nivel aplicar)))))
+
+(define (realizar proc env traçar form . info)
+    (if traçar (apply printf (string-append "TRAÇO: " form "\n") info) '())
+    (proc env))
