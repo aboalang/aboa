@@ -75,37 +75,44 @@
 (provide aboa)
 (define (aboa tokens)
   (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA ANALISADA:\n" tokens)
-  (aval-recur tokens '() (current-command-line-arguments) "" 0 #f))
+  (aval-recur tokens '() (current-command-line-arguments) "" 0 #t))
 
 (define traçar #t)
 
-(define (aval-recur tokens env arg nomeent nivel aplicar)
+(define (aval-recur tokens env arg nome profund aplicar)
   (if (null? tokens)
-    '()
-    (let
-      ([m (match (car tokens)
-        [(list 'ch c) (cons arg (string-append nomeent (string c)))]
-        ;['ei          #:when (eq? (cadr tokens) 'pr)
-        ;                (and (list? (car acc))
-        ;                     (eq? (caar acc) 'sc))) '(sr)]
-        ['po          (cons arg (string-append nomeent "."))]
-        ;['pr          (aval-recur tokens env arg nomeent nivel #t)]
-        ['sd          (cons arg "$")]
-        [(list 'st s) (cons s   "")]
-        [_            (cons arg "")]
-      )])
-      (let
-        ([res (car m)] [nomesaí (cdr m)])
-        (if (and (not (equal? nomeent ""))
-                      (equal? nomesaí ""))
-            (realizar (λ (env) env)
-                      env traçar "_~v_ ~v" nivel (string->symbol nomeent))
-            '())
-        (if (not (eq? arg res))
-            (realizar (λ (env) env)
-                      env traçar "_~v_ ~v --> ~v" nivel arg res)
-            '())
-        (aval-recur (cdr tokens) env res nomesaí nivel aplicar)))))
+    arg
+    (let*
+      ([t0                     (car  tokens)]
+       [t1s (if (pair? tokens) (cdr  tokens) '())]
+       [t1  (if (pair? t1s)    (cadr tokens) '())]
+       [t2s (if (pair? t1s)    (cddr tokens) '())]
+       [p (match t0 ;; tratar construção dum nome
+            [(list 'ch c) (cons arg (string-append nome (string c)))]
+            ['po          (cons arg (string-append nome "."))]
+            ['sd          (cons arg "$")]
+            [(list 'st s) (cons s   "")]
+            [_            (cons arg "")])]
+       [r (car p)]
+       [n (cdr p)])
+      (match t0
+        ['ei  #:when (eq? t1 'fu) ;; #TODO FLAG VALUE IS FUNCTION
+                (aval-recur t2s env arg nome (+ 1 profund) #f)]
+        ['ei  #:when (eq? t1 'pr) ;; #TODO FLAG VALUE IS PROCEDURE
+                (aval-recur t2s env arg nome (+ 1 profund) #f)]
+        ['pr    (aval-recur t1s env arg nome      profund  #t)]
+        [_    (begin
+                (if (and (not (equal? nome ""))
+                              (equal? n    ""))
+                    (realizar (λ (env) env)
+                              env traçar "_~v_ ~v" profund (string->symbol nome))
+                    '())
+                (if (not (eq? arg r))
+                    (realizar (λ (env) env)
+                              env traçar "_~v_ ~v --> ~v" profund arg r)
+                    '())
+                (aval-recur t1s env r n profund aplicar))
+        ]))))
 
 (define (realizar proc env traçar form . info)
     (if traçar (apply printf (string-append "TRAÇO: " form "\n") info) '())
