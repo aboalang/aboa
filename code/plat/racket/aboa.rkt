@@ -75,44 +75,59 @@
 (provide aboa)
 (define (aboa tokens)
   (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA ANALISADA:\n" tokens)
-  (aval-recur tokens '() (current-command-line-arguments) "" 0 #t))
+  (aval-recur tokens '() (list (current-command-line-arguments) 'args 'inic)))
 
 (define traçar #t)
 
-(define (aval-recur tokens env arg nome profund aplicar)
+(define (aval-recur tokens env pilha)
   (if (null? tokens)
-    arg
+    pilha
     (let*
-      ([t0                     (car  tokens)]
-       [t1s (if (pair? tokens) (cdr  tokens) '())]
-       [t1  (if (pair? t1s)    (cadr tokens) '())]
-       [t2s (if (pair? t1s)    (cddr tokens) '())]
-       [p (match t0 ;; tratar construção dum nome
-            [(list 'ch c) (cons arg (string-append nome (string c)))]
-            ['po          (cons arg (string-append nome "."))]
-            ['sd          (cons arg "$")]
-            [(list 'st s) (cons s   "")]
-            [_            (cons arg "")])]
-       [r (car p)]
-       [n (cdr p)])
-      (match t0
-        ['ei  #:when (eq? t1 'fu) ;; #TODO FLAG VALUE IS FUNCTION
-                (aval-recur t2s env arg nome (+ 1 profund) #f)]
-        ['ei  #:when (eq? t1 'pr) ;; #TODO FLAG VALUE IS PROCEDURE
-                (aval-recur t2s env arg nome (+ 1 profund) #f)]
-        ['pr    (aval-recur t1s env arg nome      profund  #t)]
-        [_    (begin
-                (if (and (not (equal? nome ""))
-                              (equal? n    ""))
-                    (realizar (λ (env) env)
-                              env traçar "_~v_ ~v" profund (string->symbol nome))
-                    '())
-                (if (not (eq? arg r))
-                    (realizar (λ (env) env)
-                              env traçar "_~v_ ~v --> ~v" profund arg r)
-                    '())
-                (aval-recur t1s env r n profund aplicar))
-        ]))))
+      ([ta                     (car  tokens)]
+       [td  (if (pair? tokens) (cdr  tokens) '())]
+       [tad (if (pair? td)     (cadr tokens) '())]
+       ;; operator
+       [p (match ta ;; tratar construção dum nome
+         ['ei #:when (eq? tad 'fu) (cons 'nefu pilha)]
+         ['ei #:when (eq? tad 'pr) (cons 'nepr pilha)]
+         ['ei                      (cons 'nesi pilha)]
+         ['ef                      (cons 'nesf pilha)]
+         ['sd          (pilha-nome-assign pilha "$")]
+         ['po          (pilha-nome-append pilha ".")]
+         [(list 'ch c) (pilha-nome-append pilha (string c))]
+         [(list 'st s) (pilha-lite-assign pilha s)]
+         [_
+            ((λ (t) (if (member t '(ac pr))
+                        (cons t (cons 'oper pilha))
+                        pilha))
+             ta)])])
+      ;(if (and (not (equal? nome ""))
+      ;                (equal? n    ""))
+      ;      (realizar (λ (env) env)
+      ;                env traçar "_~v_ ~v" profund (string->symbol nome))
+      ;      '())
+      ;(if (not (eq? arg r))
+      ;      (realizar (λ (env) env)
+      ;                env traçar "_~v_ ~v --> ~v" profund arg r)
+      ;      '())
+        (if traçar (printf "PILHA: ~v\n" p) '())
+        (aval-recur td env p))))
+
+(define (pilha-lite-estab pilha)
+  (if (eq? 'lite (cadr pilha)) pilha (cons "" (cons 'lite pilha))))
+
+(define (pilha-lite-assign pilha str)
+  (cons str (cdr (pilha-lite-estab pilha))))
+
+(define (pilha-nome-estab pilha)
+  (if (eq? 'nome (cadr pilha)) pilha (cons "" (cons 'nome pilha))))
+
+(define (pilha-nome-assign pilha str)
+  (cons str (cdr (pilha-nome-estab pilha))))
+
+(define (pilha-nome-append pilha str)
+  (let ([p (pilha-nome-estab pilha)])
+    (cons (string-append (car p) str) (cdr p))))
 
 (define (realizar proc env traçar form . info)
     (if traçar (apply printf (string-append "TRAÇO: " form "\n") info) '())
