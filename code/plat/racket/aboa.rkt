@@ -34,7 +34,7 @@
                                (eq? (caar acc) 'sc))) `((sc ,c))]
           [#\] #:when     (eq? (car acc) 'al) '(ae)]
           [#\. #:when     (eq? (car acc) 'po) '(rn)]
-          [#\. '(po)] [#\, '(ac)]
+          [#\. '(po)] [#\, '(ac)] [#\/ '(sl)]
           [#\_ '(ag)] [#\[ '(al)] [#\] '(ar)] [#\# '(cm)]
           [#\~ '(ca)] [#\( '(ei)] [#\= '(eq)] [#\) '(ef)]
           [#\! '(fl)] [#\^ '(fu)] [#\? '(if)] [#\& '(it)]
@@ -97,7 +97,7 @@
          [(list 'ch c) (pilha-nome-append pilha (string c))]
          [(list 'st s) (pilha-lite-assign pilha s)]
          [_
-            ((λ (t) (if (member t '(ac pr))
+            ((λ (t) (if (member t '(ac ca eq fl if it pr re sl))
                         (cons t (cons 'oper pilha))
                         pilha))
              ta)])])
@@ -110,7 +110,7 @@
       ;      (realizar (λ (env) env)
       ;                env traçar "_~v_ ~v --> ~v" profund arg r)
       ;      '())
-        (if traçar (printf "PILHA: ~v\n" p) '())
+        (if traçar (printf "PILHA: ~v ~v\n" (cadr p) (car p)) '())
         (aval-recur td env p))))
 
 (define (pilha-lite-estab pilha)
