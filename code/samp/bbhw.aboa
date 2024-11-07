@@ -29,7 +29,7 @@
 
 # TACIT
 
->(,(^==()) ? (> "countdown: " >$io.si)
+>(,(^==:) ? (> "countdown: " >$io.si)
   :i ! (> "Invalid countdown "~_1~", try again...\n" >$io.sof () </))
 >("World, Hello..." >$io.sof _)
 ..0 & (> _2~"..." >$io.sof 1 >$cc.sleep)

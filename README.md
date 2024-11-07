@@ -51,8 +51,8 @@ but now deviating quite far away from Lisps, with the following differences:
     #           ;                 comment
     _           argname           expression input argument reference, single list in aboa, one or more in Scheme
     _n          argname           nth list element of input argument reference
-    ()          ()                empty list value
-    ~           '()               dyadic catenate L to R
+    :           '()               empty list value
+    ~                             dyadic catenate L to R
     (...)       (...)             bounds of expression list,  applied immediately, left to right
     >( ...)     (...)             apply   anon procedure (effectful), left to right
     (> ...)     (lambda ...)      declare anon procedure (effectful)

@@ -34,11 +34,13 @@
                                (eq? (caar acc) 'sc))) `((sc ,c))]
           [#\] #:when     (eq? (car acc) 'al) '(ae)]
           [#\. #:when     (eq? (car acc) 'po) '(rn)]
-          [#\. '(po)] [#\, '(ac)] [#\/ '(sl)]
-          [#\_ '(ag)] [#\[ '(al)] [#\] '(ar)] [#\# '(cm)]
-          [#\~ '(ca)] [#\( '(ei)] [#\= '(eq)] [#\) '(ef)]
-          [#\! '(fl)] [#\^ '(fu)] [#\? '(if)] [#\& '(it)]
-          [#\> '(pr)] [#\< '(re)] [#\$ '(sd)] [#\% '(ty)]
+          [#\. '(po)] [#\, '(ac)] [#\/ '(ba)]
+          [#\_ '(pa)] [#\[ '(al)] [#\] '(ar)] [#\# '(cm)]
+          [#\~ '(ca)] [#\( '(ei)] [#\= '(ig)] [#\) '(ef)]
+          [#\! '(fl)] [#\^ '(fu)] [#\? '(se)] [#\& '(it)]
+          [#\> '(pr)] [#\< '(re)] [#\$ '(pd)] [#\: '(ti)]
+          [_   #:when (char-alphabetic? c) `((ab ,c))]
+          [_   #:when (char-numeric?    c) `((nu ,c))]
           [_   #:when (char-whitespace? c) '()]
           [_   `((ch ,c))])
         acc))
@@ -47,11 +49,19 @@
   (define fonte-tokens (reverse (car (sequence-fold
     (lambda (acc t)
       (match t
-        ['sl          (list (car acc) '("")    )]
+        ['sl          (list (car acc) '(""))]
         [(list 'sc c) (list (car acc) (list (string-append (caadr acc) (string c))))]
         ['sr          (list (append   (list (list 'st (caadr acc))) (car acc)))]
+        ['pd          (list (car acc) '("$"))]
+        [(list 'ab c) #:when (empty? (cdr acc))
+                      (list (car acc) (list (string c)))]
+        [(list 'ab c) (list (car acc) (list (string-append (caadr acc) (string c))))]
+        ['po          #:when (not (empty? (cdr acc)))
+                      (list (car acc) (list (string-append (caadr acc) ".")))]
+        [_            #:when (not (empty? (cdr acc)))
+                      (list (append   (list t) (list (list 'no (caadr acc))) (car acc)))]
         [_            (list (append   (list t                     ) (car acc)))]))
-    '(() ()) ; initial acc
+    '(()) ; initial acc
     fonte-tokinhos))))
   ;(fprintf (current-output-port) "~s" fonte-tokens)
   ;(define fonte-datum (read-aboa (open-input-string src-string))) ; racket reader strips out comments
@@ -75,7 +85,7 @@
 (provide aboa)
 (define (aboa tokens)
   (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA ANALISADA:\n" tokens)
-  (aval-recur tokens '() (list (current-command-line-arguments) 'args 'inic)))
+  (aval-recur tokens '() (list (current-command-line-arguments) 'argu 'inic 'nãop)))
 
 (define traçar #t)
 
@@ -86,21 +96,26 @@
       ([ta                     (car  tokens)]
        [td  (if (pair? tokens) (cdr  tokens) '())]
        [tad (if (pair? td)     (cadr tokens) '())]
-       ;; operator
-       [p (match ta ;; tratar construção dum nome
-         ['ei #:when (eq? tad 'fu) (cons 'nefu pilha)]
-         ['ei #:when (eq? tad 'pr) (cons 'nepr pilha)]
-         ['ei                      (cons 'nesi pilha)]
-         ['ef                      (cons 'nesf pilha)]
-         ['sd          (pilha-nome-assign pilha "$")]
-         ['po          (pilha-nome-append pilha ".")]
-         [(list 'ch c) (pilha-nome-append pilha (string c))]
-         [(list 'st s) (pilha-lite-assign pilha s)]
-         [_
-            ((λ (t) (if (member t '(ac ca eq fl if it pr re sl))
-                        (cons t (cons 'oper pilha))
-                        pilha))
-             ta)])])
+       [p0 (match ta
+          ['ei #:when (eq? tad 'fu) (cons 'nefu pilha)]
+          ['ei #:when (eq? tad 'pr) (cons 'nepr pilha)]
+          ['ei                      (cons 'nesi pilha)]
+          ['ef                      (cons 'nesf pilha)]
+          ['ti                      (cons 'tipo pilha)]
+          [(list 'st s) (pilha-lite-assign pilha s)]
+          [(list 'no s) (pilha-nome-assign pilha s)]
+          [_ (cond [(member ta '(pa))
+                    (cons   ta (cons 'opmo pilha))]
+                   [(member ta '(ac ca fl ig it pr re se sl))
+                    (cons   ta (cons 'opdi pilha))]
+                   [else pilha])]
+        )]
+       [p1 (cond [(realizar-opmo p0)]
+                 [(realizar-opdi p0)]
+                 [else p0])]
+      )
+      (if traçar (printf "PILHA 0: ~v ~v ~v ~v\n" (car p0) (cadr p0) (caddr p0) (cadddr p0)) '())
+      (if traçar (printf "PILHA 1: ~v ~v ~v ~v\n" (car p1) (cadr p1) (caddr p1) (cadddr p1)) '())
       ;(if (and (not (equal? nome ""))
       ;                (equal? n    ""))
       ;      (realizar (λ (env) env)
@@ -110,8 +125,7 @@
       ;      (realizar (λ (env) env)
       ;                env traçar "_~v_ ~v --> ~v" profund arg r)
       ;      '())
-        (if traçar (printf "PILHA: ~v ~v\n" (cadr p) (car p)) '())
-        (aval-recur td env p))))
+        (aval-recur td env p1))))
 
 (define (pilha-lite-estab pilha)
   (if (eq? 'lite (cadr pilha)) pilha (cons "" (cons 'lite pilha))))
@@ -129,6 +143,22 @@
   (let ([p (pilha-nome-estab pilha)])
     (cons (string-append (car p) str) (cdr p))))
 
+(define (realizar-opmo pilha)
+  (if (and (not (empty? pilha)) (eq? 'opmo (cadr pilha)))
+      (begin
+        ;; TODO ### NO-OP FOR NOW
+        (cddr pilha))
+      #f))
+
+(define (realizar-opdi pilha)
+  (let*-values ([(antop  depop) (splitf-at-right pilha (λ (x) (not (eq? x 'opdi))))])
+    (if (< 1 (length antop))
+        (begin (printf "antop ~v\n" antop)
+               (printf "depop ~v\n" depop)
+          ;; TODO ### NO-OP FOR NOW
+          depop)
+        #f)))
+
 (define (realizar proc env traçar form . info)
-    (if traçar (apply printf (string-append "TRAÇO: " form "\n") info) '())
-    (proc env))
+  (if traçar (apply printf (string-append "TRAÇO: " form "\n") info) '())
+  (proc env))
