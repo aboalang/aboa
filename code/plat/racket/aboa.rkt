@@ -7,6 +7,11 @@
 ;;; file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;;;
 
+(define traçar #t)
+
+(define (traçe form . info)
+  (if traçar (apply printf (string-append "## TRAÇO: " form "~n") info) '()))
+
 ;; READER
 
 (provide (rename-out
@@ -84,10 +89,8 @@
 
 (provide aboa)
 (define (aboa tokens)
-  (fprintf (current-output-port) "ABOA TOKENS:\n~s\nABOA ANALISADA:\n" tokens)
+  (traçe "tokens:~n~s" tokens)
   (aval-recur tokens '() (list (current-command-line-arguments) 'argu 'inic 'nãop)))
-
-(define traçar #t)
 
 (define (aval-recur tokens env pilha)
   (if (null? tokens)
@@ -114,8 +117,9 @@
                  [(realizar-opdi p0)]
                  [else p0])]
       )
-      (if traçar (printf "PILHA 0: ~v ~v ~v ~v\n" (car p0) (cadr p0) (caddr p0) (cadddr p0)) '())
-      (if traçar (printf "PILHA 1: ~v ~v ~v ~v\n" (car p1) (cadr p1) (caddr p1) (cadddr p1)) '())
+      (if (and traçar (not (eq? p0 p1))) (begin
+          (traçe "p0 ~a ~v" (~r (length p0) #:min-width 2) p0)
+          (traçe "p1 ~a ~v" (~r (length p1) #:min-width 2) p1)) '())
       ;(if (and (not (equal? nome ""))
       ;                (equal? n    ""))
       ;      (realizar (λ (env) env)
@@ -153,12 +157,11 @@
 (define (realizar-opdi pilha)
   (let*-values ([(antop  depop) (splitf-at-right pilha (λ (x) (not (eq? x 'opdi))))])
     (if (< 1 (length antop))
-        (begin (printf "antop ~v\n" antop)
-               (printf "depop ~v\n" depop)
+        (begin (traçe "antop ~v" antop)
+               (traçe "depop ~v" depop)
           ;; TODO ### NO-OP FOR NOW
           depop)
         #f)))
 
 (define (realizar proc env traçar form . info)
-  (if traçar (apply printf (string-append "TRAÇO: " form "\n") info) '())
-  (proc env))
+  (traçe form info) (proc env))
