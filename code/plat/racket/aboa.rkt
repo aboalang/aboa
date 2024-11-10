@@ -118,8 +118,8 @@
                  [else p0])]
       )
       (if (and traçar (not (eq? p0 p1))) (begin
-          (traçe "p0 ~a ~v" (~r (length p0) #:min-width 2) p0)
-          (traçe "p1 ~a ~v" (~r (length p1) #:min-width 2) p1)) '())
+          (traçe "p0 ~a ~v" (~r (length p0) #:min-width 3) p0)
+          (traçe "p1 ~a ~v" (~r (length p1) #:min-width 3) p1)) '())
       ;(if (and (not (equal? nome ""))
       ;                (equal? n    ""))
       ;      (realizar (λ (env) env)
@@ -129,7 +129,7 @@
       ;      (realizar (λ (env) env)
       ;                env traçar "_~v_ ~v --> ~v" profund arg r)
       ;      '())
-        (aval-recur td env p1))))
+      (aval-recur td env p1))))
 
 (define (pilha-lite-estab pilha)
   (if (eq? 'lite (cadr pilha)) pilha (cons "" (cons 'lite pilha))))
@@ -155,13 +155,29 @@
       #f))
 
 (define (realizar-opdi pilha)
-  (let*-values ([(antop  depop) (splitf-at-right pilha (λ (x) (not (eq? x 'opdi))))])
-    (if (< 1 (length antop))
-        (begin (traçe "antop ~v" antop)
-               (traçe "depop ~v" depop)
-          ;; TODO ### NO-OP FOR NOW
-          depop)
+  (let*-values ([(opdid opdia) (splitf-at-right pilha (λ (x) (not (eq? x 'opdi))))])
+    (if (< 3 (length opdid))
+        (begin ;; TODO ###: HACK THAT WE HAVE RIGHT ARG
+          (traçe "opdi a ~v" opdia) (traçe "opdi d ~v" opdid)
+          (let* ([a (cons (car opdia) (cadr opdia))]
+                 [d (cons (car opdid) (cadr opdid))]
+                 [o (caddr opdid)]
+                 [p (cddr opdia)]) ;; TODO ###: CONSUMING ALL FOR NOW
+            (match o
+              ['pr (realizar-pr a d)]
+              ;; TODO: ### MUITO MAIS
+              [_ (traçe "opdi não funçiona: ~v" o)]
+            )
+          p))
         #f)))
+
+(define (realizar-pr paira paird)
+    (traçe "pr paira ~v" paira) (traçe "pr paird ~v" paird)
+    (match paird
+      ['("$io.sof" . nome) (printf (car paira))]
+      ;; TODO: ### MUITO MAIS
+      [_ (traçe "pr não funçiona: ~v > ~v" paird paira)]
+    ))
 
 (define (realizar proc env traçar form . info)
   (traçe form info) (proc env))
