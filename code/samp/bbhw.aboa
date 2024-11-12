@@ -12,28 +12,28 @@
 
 # WORDY
 
-##arg-empty   (^ ==())
-##ask-count   (> "countdown: " >$io.si)
-##str-to-int  (^ :i)
-##say-invalid (> "Invalid countdown "~_~", try again...\n" >$io.sof)
-##get-count   (> ,arg-empty ? ask-count ^str-to-int ! (_1 say-invalid () </))
-##say-hello   (> "World, Hello..." >$io.sof _)
-##say-second  (> ~"..." >$io.sof 1 >$cc.sleep)
-##count-down  (> ..1 & (> _2 say-second))
-##say-bye-bye (> "Bye Bye.\n" >$io.sof)
-##
-##>get-count
-##>say-hello
-##>count-down
-##>say-bye-bye
+##arg-empty   (^ _ ==:)
+##ask-count   (* "countdown: " >$io.si)
+##to-int      (^ :i)
+##say-invalid (* "Invalid countdown "~_~", try again...\n" >*$io.sof)
+##get-count   (* arg-empty ? ask-count to-int ! (_1 say-invalid : </))
+##say-hello   (* _ "World, Hello..." >*$io.sof)
+##say-second  (* ~"..." >*$io.sof 1 >*$cc.sleep)
+##count-down  (* ..0 & (* _2 >*say-second))
+##say-bye-bye (* "Bye Bye.\n" >*$io.sof)
+
+##>*get-count
+##>*say-hello
+##>*count-down
+##>*say-bye-bye
 
 # TACIT
 
->(,(^==:) ? (> "countdown: " >$io.si)
-  :i ! (> "Invalid countdown "~_1~", try again...\n" >$io.sof () </))
->("World, Hello..." >$io.sof _)
-..0 & (> _2~"..." >$io.sof 1 >$cc.sleep)
-"Bye Bye.\n" >$io.sof
+((^_==:) ? (* "countdown: " >*$io.si)
+  :i ! (* "Invalid countdown "~_1~", try again...\n" >*$io.sof () </))
+"World, Hello..." >*$io.sof
+..0 & (* _2~"..." >*$io.sof 1 >*$cc.sleep)
+"Bye Bye.\n" >*$io.sof
 
 # GOLF
 
@@ -41,10 +41,11 @@
 
 #   L               F               R             operation
 
-#   arglist         >(                            monadic apply anon proc begin
+#   arglist         >                             dyadic apply
+#   arglist         (                             expression begin
 #   arglist         ,               (^==())       dyadic append
-#   arglist,(^==()) ?               >("count...   dyadic if instead
-#   arglist         (>                            monadic declare anon proc begin (0/true expression)
+#   arglist,(^==()) ?_              >("count...   dyadic if instead
+#   arglist         (*                            monadic declare anon proc begin (0/true expression)
 #   arglist         "count..."                    monadic value
 #   "count..."      >               $io:si        dyadic apply pre proc standard input with prompt
 #   input           )                             monadic declare anon proc end
@@ -73,5 +74,5 @@
 #   "i..."          1                             monadic value
 #   1               >               $cc.sleep     dyadic execute pre proc sleep
 #   1               )                             monadic eval end
-#   0               "Bye Bye.\n"                  monadic value
-#   "Bye Bye.\n"    >               $io.sof       dyadic execute pre proc standard output and flush
+#   0               "Bye Bye.\n"                  monadic literal
+#   "Bye Bye.\n"    >*               $io.sof      dyadic execute pre proc standard output and flush
