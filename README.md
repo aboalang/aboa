@@ -51,18 +51,19 @@ but now deviating quite far away from Lisps, with the following differences:
     #           ;                 comment
     _           argname           expression input argument reference, single list in aboa, one or more in Scheme
     _n          argname           nth list element of input argument reference
-    :           '()               empty list value
+    :           '()               empty value
     ~                             dyadic catenate L to R
-    (...)       (...)             bounds of expression list,  applied immediately, left to right
-    >( ...)     (...)             apply   anon procedure (effectful), left to right
-    (> ...)     (lambda ...)      declare anon procedure (effectful)
+    (...)       (...)             bounds of nesting
+    >           (...)             apply function  (pure),      left to right
+    >*          (...)             apply procedure (effectful), left to right
     (^ ...)                       declare anon function  (pure)
+    (* ...)     (lambda ...)      declare anon procedure (effectful)
     name(                         beginning of named expression that serves as comment or point of reference
     )name                         end of named expression, required when its beginning is named
     name(^ ...                    define named function  (pure)
-    name(> ...  define (name ...  define named procedure (effectful)
-    ^name                         apply named function, its one argument comes from its left
-    >name       (p ...)           apply named procedure, in aboa its one argument comes from its left
+    name(* ...  define (name ...  define named procedure (effectful)
+    >name                         apply named function, its one argument comes from its left
+    >*name      (p ...)           apply named procedure, in aboa its one argument comes from its left
     _           argname           argument reference, single list in aboa, one or more in Scheme
     <)          (p ...)           tail recursion to beginning of func/proc
 
