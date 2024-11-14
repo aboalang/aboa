@@ -71,7 +71,7 @@
                       (list (car acc) (list (string-append (caadr acc) ".")))]
         [_            #:when (not (empty? (cdr acc)))
                       (list (append   (list t) (list (list 'no (caadr acc))) (car acc)))]
-        [_            (list (append   (list t                     ) (car acc)))]))
+        [_            (list (append   (list t) (car acc)))]))
     '(()) ; initial acc
     fonte-tokinhos))))
   ;(fprintf (current-output-port) "~s" fonte-tokens)
@@ -116,8 +116,9 @@
           ['ni                       (cons 'nesi pilha)]
           ['nf                       (cons 'nesf pilha)]
           ['ti                       (cons 'tipo pilha)]
-          [(list 'st s) (pilha-lite-assign pilha s)]
           [(list 'no s) (pilha-nome-assign pilha s)]
+          [(list 'nu s) (pilha-lite-assign pilha s)]
+          [(list 'st s) (pilha-lite-assign pilha s)]
           [_ (cond [(member ta '(pi))
                     (cons   ta (cons 'opmo pilha))]
                    [(member ta '(ac ca fl ig it re se sl))
@@ -173,12 +174,22 @@
             (begin (erro ">* missing name of procedure")
                    (cons ppri (cons pseg pres)))
             (match ppri
-              ["$io.si"  (exe-pad-io-si  ppri pres)]
-              ["$io.sof" (exe-pad-io-sof ppri pres)]
+              ["$cc.sleep"  (exe-pad-cc-sleep ppri pres)]
+              ["$io.si"     (exe-pad-io-si    ppri pres)]
+              ["$io.sof"    (exe-pad-io-sof   ppri pres)]
               ;; TODO: ### MUITO MAIS
               [_ (begin (erro ">* unknown procedure named ~a" ppri)
                         pres)])))
       #f))
+
+(define (exe-pad-cc-sleep nome pilha)
+  (if (req-arg-lite-em-pilha nome pilha)
+      (let ([seg (string->number (string (car pilha)))])
+        (if (and (integer? seg) (>= seg 0))
+          (sleep seg)
+          (erro "~a invalid argument for seconds: ~v" nome seg))
+        (cddr pilha))
+      pilha))
 
 (define (exe-pad-io-si nome pilha)
   (if (req-arg-lite-em-pilha nome pilha)
