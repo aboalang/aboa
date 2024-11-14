@@ -173,21 +173,30 @@
             (begin (erro ">* missing name of procedure")
                    (cons ppri (cons pseg pres)))
             (match ppri
-              ["$io.sof" (exe-nome-proc-lite ppri printf pres)]
+              ["$io.si"  (exe-pad-io-si  ppri pres)]
+              ["$io.sof" (exe-pad-io-sof ppri pres)]
               ;; TODO: ### MUITO MAIS
               [_ (begin (erro ">* unknown procedure named ~a" ppri)
                         pres)])))
       #f))
 
-(define (exe-nome-proc-lite nome proc pilha)
-  ;(traçe "nome ~v" nome)
-  ;(traçe "proc ~v" proc)
-  ;(traçe "pilha ~v" pilha)
-  (if (and (< 1 (length pilha)) (eq? 'lite (cadr pilha)))
-      (begin (proc (car pilha))
+(define (exe-pad-io-si nome pilha)
+  (if (req-arg-lite-em-pilha nome pilha)
+      (begin (printf (car pilha))
+             (cons (read-line) (cons 'lite (cddr pilha))))
+      pilha))
+
+(define (exe-pad-io-sof      nome pilha)
+  (if (req-arg-lite-em-pilha nome pilha)
+      (begin (printf (car pilha))
              (cddr pilha))
+      pilha))
+
+(define (req-arg-lite-em-pilha nome pilha)
+  (if (and (< 1 (length pilha)) (eq? 'lite (cadr pilha)))
+      pilha
       (begin (erro "literal arg required for ~a" nome)
-             pilha)))
+             #f)))
 
 #| TODO: ### AGORA NÃO USAR
 
