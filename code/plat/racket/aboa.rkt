@@ -7,7 +7,7 @@
 ;;; file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;;;
 
-(define traçar #t)
+(define traçar #f)
 
 (define (traçe form . info) (if traçar
   (apply  printf (string-append "## aboa traço: " form "~n") info) '()))
@@ -130,14 +130,12 @@
              pilha]
         )]
        [p1 (begin
-              (if (and traçar (not (eq? p0 pilha)))
-                  (traçe "p0 ~a ~v" (~r (length p0) #:min-width 3) p0) '())
-              (cond [(eq? p0 pilha) p0]
-                 ;;[(realizar-exfu p0)]
-                 [(realizar-expr p0)]
-                 ;;[(realizar-opmo p0)]
-                 ;;[(realizar-opdi p0)]
-                 [else p0]))]
+          (if (and traçar (not (eq? p0 pilha)))
+              (traçe "p0 ~a ~v" (~r (length p0) #:min-width 3) p0)
+              '())
+          (if (eq? p0 pilha)
+              p0
+              (real-recur p0)))]
       )
       (if (and traçar (not (eq? p0 p1)))
           (traçe "p1 ~a ~v" (~r (length p1) #:min-width 3) p1) '())
@@ -159,7 +157,23 @@
   (let ([p (pilha-nome-estab pilha)])
     (cons (string-append (car p) str) (cdr p))))
 
-(define (realizar-expr pilha)
+(define (real-recur p0)
+  (let ([p1 (match (car p0)
+              ['nesf (real-nesf p0)]
+              [_     (cond [(real-expr p0)]
+                           [else p0])])])
+    (if (eq? p1 p0) p0 (real-recur p1))))
+
+(define (real-nesf p0)
+  (let-values ([(pa pd) (splitf-at p0 (λ (x) (not (eq? x 'nesi))))])
+    ;(traçe "real-nesf: ~v ||| ~v" pa pd)
+    (if (empty? pd)
+        (begin (erro ") missing leading (") (cdr p0))
+        (begin
+          ; TODO: ### IMPLEMENT DEFINITIIONS
+          (cdr pd)))))
+
+(define (real-expr pilha)
   (if (and (< 3  (length pilha)) (eq? 'expr (caddr pilha)))
       (let ([ppri  (car  pilha)]
             [pseg  (cadr pilha)]
