@@ -7,7 +7,7 @@
 ;;; file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;;;
 
-(define traçar #f)
+(define traçar #t)
 
 (define (traçe form . info) (if traçar
   (apply  printf (string-append "## aboa traço: " form "~n") info) '()))
@@ -32,21 +32,22 @@
         (match c
           [#\newline '(nl)]
           [#\return  '(nl)]
-          [_   #:when     (eq? (car acc) 'cm) '()]
-          [#\" #:when (or (eq? (car acc) 'sl)
+          [_   #:when     (eq? (car acc) 'ca) '()]
+          [#\" #:when (or (eq? (car acc) 'se)
                           (and (list? (car acc))
-                               (eq? (caar acc) 'sc))) '(sr)]
-          [#\" '(sl)]
-          [c   #:when (or (eq? (car acc) 'sl)
+                               (eq? (caar acc) 'sc))) '(sd)]
+          [#\" '(se)]
+          [c   #:when (or (eq? (car acc) 'se)
                           (and (list? (car acc))
                                (eq? (caar acc) 'sc))) `((sc ,c))]
-          [#\] #:when     (eq? (car acc) 'al) '(ae)]
           [#\. #:when     (eq? (car acc) 'po) '(rn)]
-          [#\. '(po)] [#\, '(ac)] [#\/ '(ba)] [#\_ '(pi)]
-          [#\[ '(al)] [#\] '(ar)] [#\# '(cm)] [#\~ '(ca)]
-          [#\( '(ni)] [#\= '(ig)] [#\) '(nf)] [#\! '(fl)]
-          [#\^ '(fu)] [#\* '(pr)] [#\? '(se)] [#\& '(it)]
-          [#\> '(ex)] [#\< '(re)] [#\$ '(pd)] [#\: '(ti)]
+          [#\> '(ad)] [#\< '(ae)] [#\' '(ap)] [#\@ '(ar)]
+          [#\* '(as)] [#\/ '(ba)] [#\| '(bv)] [#\# '(ca)]
+          [#\] '(cd)] [#\[ '(ce)] [#\^ '(ci)] [#\$ '(do)]
+          [#\: '(dp)] [#\& '(ec)] [#\! '(ex)] [#\? '(in)]
+          [#\. '(po)] [#\% '(pc)] [#\) '(pd)] [#\( '(pe)]
+          [#\; '(pv)] [#\= '(si)] [#\+ '(sm)] [#\~ '(ti)]
+          [#\_ '(tr)] [#\, '(vi)]
           ;;[#\- '(tr)] ;; TODO: ### trata como alpha por agora
           [#\-                             `((ab ,c))]
           [_   #:when (and (char-whitespace? c) (eq? (car acc) 'eb)) '()]
@@ -60,10 +61,10 @@
   (define fonte-tokens (reverse (car (sequence-fold
     (lambda (acc t)
       (match t
-        ['sl          (list (car acc) '(""))]
+        ['se          (list (car acc) '(""))]
         [(list 'sc c) (list (car acc) (list (string-append (caadr acc) (string c))))]
-        ['sr          (list (append   (list (list 'st (caadr acc))) (car acc)))]
-        ['pd          (list (car acc) '("$"))]
+        ['sd          (list (append   (list (list 'st (caadr acc))) (car acc)))]
+        ['do          (list (car acc) '("$"))]
         [(list 'ab c) #:when (empty? (cdr acc))
                       (list (car acc) (list (string c)))]
         [(list 'ab c) (list (car acc) (list (string-append (caadr acc) (string c))))]
@@ -106,44 +107,40 @@
        [td  (if (pair? tokens) (cdr  tokens) '())]
        [tad (if (pair? td)     (cadr tokens) '())]
        [p0 (match ta
-          [(or 'cm 'eb 'nl)                      pilha ] ;; ignore
-          [(or 'fu 'pr) #:when (or (eq? tz 'ex)
-                                   (eq? tz 'ni)) pilha ] ;; já usado
-          ['ex #:when (eq? tad 'fu)  (cons 'exfu pilha)]
-          ['ex #:when (eq? tad 'pr)  (cons 'expr pilha)]
-          ['ni #:when (eq? tad 'fu)  (cons 'defu pilha)]
-          ['ni #:when (eq? tad 'pr)  (cons 'depr pilha)]
-          ['ni                       (cons 'nesi pilha)]
-          ['nf                       (cons 'nesf pilha)]
-          ['ti                       (cons 'tipo pilha)]
+          [(or 'ca 'eb 'nl)                      pilha ] ;; ignore
+          [(or 'ci 'as) #:when (or (eq? tz 'as)
+                                   (eq? tz 'pe)) pilha ] ;; já usado
+          ['ad #:when (eq? tad 'as)  (cons 'expr pilha)]
+          ['ad #:when (eq? tad 'ci)  (cons 'exfu pilha)]
+          ['pe #:when (eq? tad 'as)  (cons 'depr pilha)]
+          ['pe #:when (eq? tad 'ci)  (cons 'defu pilha)]
+          ['pe                       (cons 'nesi pilha)]
+          ['pd                       (cons 'nesf pilha)]
+          ['dp                       (cons 'tipo pilha)]
+          ['tr                       (cons 'pilh pilha)]
+          ['si #:when (eq? tad 'si)  (cons 'igua pilha)]
           [(list 'no s) (pilha-nome-assign pilha s)]
           [(list 'nu s) (pilha-lite-assign pilha s)]
           [(list 'st s) (pilha-lite-assign pilha s)]
-          [_ (cond [(member ta '(pi))
-                    (cons   ta (cons 'opmo pilha))]
-                   [(member ta '(ac ca fl ig it re se sl))
-                    (cons   ta (cons 'opdi pilha))]
-                   [else pilha])]
+          [_ ;(cond [(member ta '(xxx))
+             ;       (cons   ta (cons 'opmo pilha))]
+             ;      [(member ta '(ac ca fl it re se sl))
+             ;       (cons   ta (cons 'opdi pilha))]
+             ;      [else pilha])]
+             pilha]
         )]
-       [p1 (cond [(eq? p0 pilha) p0]
+       [p1 (begin
+              (if (and traçar (not (eq? p0 pilha)))
+                  (traçe "p0 ~a ~v" (~r (length p0) #:min-width 3) p0) '())
+              (cond [(eq? p0 pilha) p0]
                  ;;[(realizar-exfu p0)]
                  [(realizar-expr p0)]
                  ;;[(realizar-opmo p0)]
                  ;;[(realizar-opdi p0)]
-                 [else p0])]
+                 [else p0]))]
       )
-      (if (and traçar (not (eq? p0 p1))) (begin
-          (traçe "p0 ~a ~v" (~r (length p0) #:min-width 3) p0)
-          (traçe "p1 ~a ~v" (~r (length p1) #:min-width 3) p1)) '())
-      ;(if (and (not (equal? nome ""))
-      ;                (equal? n    ""))
-      ;      (realizar (λ (env) env)
-      ;                env traçar "_~v_ ~v" profund (string->symbol nome))
-      ;      '())
-      ;(if (not (eq? arg r))
-      ;      (realizar (λ (env) env)
-      ;                env traçar "_~v_ ~v --> ~v" profund arg r)
-      ;      '())
+      (if (and traçar (not (eq? p0 p1)))
+          (traçe "p1 ~a ~v" (~r (length p1) #:min-width 3) p1) '())
       (aval-recur ta td env p1))))
 
 (define (pilha-lite-estab pilha)
@@ -236,7 +233,7 @@
                  [o (caddr opdid)]
                  [p (cddr opdia)]) ;; TODO ###: CONSUMING ALL FOR NOW
             (match o
-              ['pr (realizar-pr a d)]
+              ['as (realizar-pr a d)]
               ;; TODO: ### MUITO MAIS
               [_ (traçe "opdi não funçiona: ~v" o)]
             )
