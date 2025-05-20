@@ -1,13 +1,12 @@
 # !/usr/bin/env aboa
 #:aboa-v-00-01
 #
-#   Copyright © 2024 Christopher Augustus
+#   Copyright © 2024 - 2025 Christopher Augustus
 #
 #   This Source Code Form is subject to the terms of the Mozilla Public
 #   License, v. 2.0. If a copy of the MPL was not distributed with this
 #   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-read  (> "aboa> "         >$io.si )
-eval  (> "evaluating: "~_ >$io.sof) # TODO: ### IMPLEMENT ME, LOLZ
-print (> "result: "~_     >$io.sof)
->loop (,^(==_.) ? >read >eval >print () <loop)
+"aboa> " >$io.si (
+  ^tx.tr ^tx.lc =| ("exit","quit","sair") ?/_ :
+  (@ ! ("error: "~_2) >$io.sof //<))
