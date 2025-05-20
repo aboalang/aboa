@@ -23033,7 +23033,7 @@ static bool is_number_via_method(s7_scheme *sc, s7_pointer p)
 
 static s7_pointer g_num_eq(s7_scheme *sc, s7_pointer args)
 {
-  #define H_num_eq "(= z1 ...) returns $t if all its arguments are equal"
+  #define H_num_eq "(== z1 ...) returns $t if all its arguments are equal" // [c4augustus]
   #define Q_num_eq s7_make_circular_signature(sc, 1, 2, sc->is_boolean_symbol, sc->is_number_symbol)
 
   s7_pointer x = car(args), p = cdr(args);
@@ -44348,7 +44348,7 @@ static const char *hash_table_checker_name(s7_scheme *sc, s7_pointer ht)
   if (hash_table_checker(ht) == hash_ci_char) return("char-ci=?");
 #endif
   if (hash_table_checker(ht) == hash_char) return("char=?");
-  if (hash_table_checker(ht) == hash_number_num_eq) return("=");
+  if (hash_table_checker(ht) == hash_number_num_eq) return("=="); // [c4augustus]
   return("$f");
 }
 
@@ -68961,9 +68961,9 @@ static void init_choosers(s7_scheme *sc)
   /* = */
   f = set_function_chooser(sc->num_eq_symbol, num_eq_chooser);
   sc->num_eq_class = c_function_class(f);
-  sc->num_eq_2 = make_function_with_class(sc, f, "=", g_num_eq_2, 2, 0, false);
-  sc->num_eq_xi = make_function_with_class(sc, f, "=", g_num_eq_xi, 2, 0, false);
-  sc->num_eq_ix = make_function_with_class(sc, f, "=", g_num_eq_ix, 2, 0, false);
+  sc->num_eq_2 = make_function_with_class(sc, f, "==", g_num_eq_2, 2, 0, false);    // [c4augustus]
+  sc->num_eq_xi = make_function_with_class(sc, f, "==", g_num_eq_xi, 2, 0, false);  // [c4augustus]
+  sc->num_eq_ix = make_function_with_class(sc, f, "==", g_num_eq_ix, 2, 0, false);  // [c4augustus]
 
   /* min */
   f = set_function_chooser(sc->min_symbol, min_chooser);
@@ -93538,9 +93538,9 @@ const char *s7_decode_bt(s7_scheme *sc)
 	    in_quotes = (!in_quotes);
 	  else
 	    if ((!in_quotes) && (i < size - 8) &&
-		((bt[i] == '=') &&
-		 (((bt[i + 1] == '0') && (bt[i + 2] == 'x')) ||
-		  ((bt[i + 1] == ' ') && (bt[i + 2] == '0') && (bt[i + 3] == 'x')))))
+		((bt[i] == '=') && (bt[i + 1] == '=') &&                              // [c4augustus]
+		 (((bt[i + 2] == '0') && (bt[i + 3] == 'x')) ||                       // [c4augustus]
+		  ((bt[i + 2] == ' ') && (bt[i + 3] == '0') && (bt[i + 4] == 'x'))))) // [c4augustus]
 	      {
 		void *vp;
 		int32_t vals = sscanf((const char *)(bt + i + 1), "%p", &vp);
@@ -94630,8 +94630,8 @@ then returns each var to its original value."
   sc->case_symbol =              syntax(sc, "case",                    OP_CASE,              int_two,  max_arity,  H_case);
   sc->macroexpand_symbol =       syntax(sc, "macroexpand",             OP_MACROEXPAND,       int_one,  int_one,    H_macroexpand);
   sc->let_temporarily_symbol =   syntax(sc, "let-temporarily",         OP_LET_TEMPORARILY,   int_two,  max_arity,  H_let_temporarily);
-  sc->define_imm_symbol =        definer_syntax(sc, "~",               OP_DEFINE,            int_two,  max_arity,  H_define);             // [c4augustus]
-  sc->define_imm_star_symbol =   definer_syntax(sc, "~*",              OP_DEFINE_STAR,       int_two,  max_arity,  H_define_star);        // [c4augustus]
+  sc->define_imm_symbol =        definer_syntax(sc, "=",               OP_DEFINE,            int_two,  max_arity,  H_define);             // [c4augustus]
+  sc->define_imm_star_symbol =   definer_syntax(sc, "=*",              OP_DEFINE_STAR,       int_two,  max_arity,  H_define_star);        // [c4augustus]
   sc->define_mut_symbol =        definer_syntax(sc, "<",               OP_DEFINE,            int_two,  max_arity,  H_define);             // [c4augustus]
   sc->define_mut_star_symbol =   definer_syntax(sc, "<*",              OP_DEFINE_STAR,       int_two,  max_arity,  H_define_star);        // [c4augustus]
   sc->define_constant_symbol =   definer_syntax(sc, "define-constant", OP_DEFINE_CONSTANT,   int_two,  max_arity,  H_define_constant);
@@ -94648,8 +94648,8 @@ then returns each var to its original value."
   sc->do_symbol =                binder_syntax(sc, "do",               OP_DO,                int_two,  max_arity,  H_do); /* 2 because body can be null */
   sc->lambda_func_symbol =       binder_syntax(sc, "^",                OP_LAMBDA,            int_two,  max_arity,  H_lambda);             // [c4augustus]
   sc->lambda_func_star_symbol =  binder_syntax(sc, "^*",               OP_LAMBDA_STAR,       int_two,  max_arity,  H_lambda_star);        // [c4augustus]
-  sc->lambda_proc_symbol =       binder_syntax(sc, "<__",              OP_LAMBDA,            int_two,  max_arity,  H_lambda);             // [c4augustus]
-  sc->lambda_proc_star_symbol =  binder_syntax(sc, "<*__",             OP_LAMBDA_STAR,       int_two,  max_arity,  H_lambda_star);        // [c4augustus]
+  sc->lambda_proc_symbol =       binder_syntax(sc, ">_",               OP_LAMBDA,            int_two,  max_arity,  H_lambda);             // [c4augustus]
+  sc->lambda_proc_star_symbol =  binder_syntax(sc, ">*_",              OP_LAMBDA_STAR,       int_two,  max_arity,  H_lambda_star);        // [c4augustus]
   sc->macro_symbol =             binder_syntax(sc, "macro",            OP_MACRO,             int_two,  max_arity,  H_macro);
   sc->macro_star_symbol =        binder_syntax(sc, "macro*",           OP_MACRO_STAR,        int_two,  max_arity,  H_macro_star);
   sc->bacro_symbol =             binder_syntax(sc, "bacro",            OP_BACRO,             int_two,  max_arity,  H_bacro);
@@ -94990,7 +94990,7 @@ static void init_rootlet(s7_scheme *sc)
   sc->quotient_symbol =              defun("quotient",		quotient,		2, 0, false); set_all_integer(sc->quotient_symbol);
   sc->remainder_symbol =             defun("remainder",	        remainder,		2, 0, false); set_all_integer(sc->remainder_symbol);
   sc->modulo_symbol =                defun("modulo",		modulo,			2, 0, false); set_all_integer(sc->modulo_symbol);
-  sc->num_eq_symbol =                defun("=",		        num_eq,			2, 0, true);
+  sc->num_eq_symbol =                defun("==",		        num_eq,			2, 0, true); // [c4augustus]
   sc->lt_symbol =                    defun("<<",		        less,			2, 0, true);
   sc->gt_symbol =                    defun(">>",		        greater,		2, 0, true);
   sc->leq_symbol =                   defun("<=",		less_or_equal,		2, 0, true);
@@ -95801,9 +95801,9 @@ s7_scheme *s7_init(void)
   sc->singletons[(uint8_t)'-'] = sc->subtract_symbol;
   sc->singletons[(uint8_t)'*'] = sc->multiply_symbol;
   sc->singletons[(uint8_t)'/'] = sc->divide_symbol;
-  //sc->singletons[(uint8_t)'<'] = sc->lt_symbol; [c4augustus]
-  //sc->singletons[(uint8_t)'>'] = sc->gt_symbol; [c4augustus]
-  sc->singletons[(uint8_t)'='] = sc->num_eq_symbol;
+  //sc->singletons[(uint8_t)'<'] = sc->lt_symbol;     // [c4augustus]
+  //sc->singletons[(uint8_t)'>'] = sc->gt_symbol;     // [c4augustus]
+  //sc->singletons[(uint8_t)'='] = sc->num_eq_symbol; // [c4augustus]
 
   init_choosers(sc);
   init_typers(sc);
