@@ -51,36 +51,46 @@ but now deviating quite far away from Lisps, with the following differences:
     #           ;                 comment
     _           argname           expression input argument reference, single list in aboa, one or more in Scheme
     _n          argname           nth list element of input argument reference
+    /_          argname           expression input of previous scope, one level per /
     :           '()               empty value
-    ~                             dyadic catenate L to R
-    (...)       (...)             bounds of nesting
-    >           (...)             apply function  (pure),      left to right
-    >*          (...)             apply procedure (effectful), left to right
     (^ ...)                       declare anon function  (pure)
-    (* ...)     (lambda ...)      declare anon procedure (effectful)
-    name(                         beginning of named expression that serves as comment or point of reference
-    )name                         end of named expression, required when its beginning is named
-    name(^ ...                    define named function  (pure)
-    name(* ...  define (name ...  define named procedure (effectful)
-    >name                         apply named function, its one argument comes from its left
-    >*name      (p ...)           apply named procedure, in aboa its one argument comes from its left
-    _           argname           argument reference, single list in aboa, one or more in Scheme
-    <)          (p ...)           tail recursion to beginning of func/proc
-
-    $                             standard library name prefix
-
-    ?           if                conditional, may become generalized with Scheme "cond"
+    (> ...)     (lambda ...)      declare anon procedure (effectful)
+    ^(...)      (...)             apply right function  expression (pure),      left to right
+    >(...)      (...)             apply right procedure expression (effectful), left to right
+    (...)       (...)             bounds of expression scope, applied when under active apply
+    name =      (define           bind right value: literal, func, proc
+    ^name                         apply bound function, its one argument comes from its left
+    >name       (p ...)           apply bound procedure, in aboa its one argument comes from its left
+    <)          (p ...)           tail recursion to beginning of expression
+    /<)                           tail recursion outward one level per /
 
     ==          =                 equal             so it's 2 characters long like !=
-    /=          !=                not equal
+    !=          !=                not equal
     <=          <=                less than or equal
     <<          <                 less than         so it's 2 characters long like <=
     >=          >=                greater than or equal
     >>          >                 greater than      so it's 2 characters long like >=
+    =|          =                 member of list, returns bitmask with 1 for each match
 
-    :i          ...->integer      dyadic convert to integer
+    :8          ...->char         monadic convert to byte (include ASCII char)
+    :f          ...->float        monadic convert to float   64
+    :i          ...->integer      monadic convert to integer 64 (bool is 0 and 1)
+    :u          ???               monadic convert to UTF-8 code point
 
-    ! ...                         on fail apply
+    ?           if                conditional, may become generalized with Scheme "cond"
+    ?/_         if                if instead passes input of previous scope through on false
+    ! ...                         on fail provide result
+
+    ..                            range of left value to right value
+
+    ,                             dyadic append values together into a list
+    ~                             dyadic catenate values L to R
+
+    &           fold
+
+    @           (eval             interpret value as aboa syntax, return result
+
+    $                             standard library name prefix
 
     OLD SCHEME EQUIVALENT SYNTAX:
 
@@ -96,10 +106,10 @@ but now deviating quite far away from Lisps, with the following differences:
 #!/usr/bin/env aboa
 #:aboa-v-00-01
 # Bye Bye Hello World
->(=[] ? ("countdown: " >$io.si) _
-  %i ! ("Invalid countdown "~_~", try again...\n" >$io.sof [] <))
-("World, Hello..." >$io.sof _)
-..0 & (_1~"..." >$io.sof 1 >$cc.sleep)
+==:  ? ("countdown: " >$io.si) _
+:i ! ("Invalid countdown "~_1~", try again...\n" >$io.sof : </)
+("World, Hello..." >$io.sof)
+_..0 & (> _2~"..." >$io.sof 1 >$cc.sleep)
 "Bye Bye.\n" >$io.sof
 ```
 
@@ -158,4 +168,4 @@ but now deviating quite far away from Lisps, with the following differences:
 
 - [aboa-vim](code/supp/vim) ViM configuration for the aboa syntax and color scheme
 
-## TODO: more to be written, by c4augustus, as of 2024.05.24
+## TODO: more to be written, by c4augustus, as of 2025.05.21
