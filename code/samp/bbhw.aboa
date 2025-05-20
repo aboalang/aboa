@@ -3,7 +3,7 @@
 #:aboa-v-00-01
 # Bye Bye Hello World
 #
-#   Copyright © 2024 Christopher Augustus
+#   Copyright © 2024 - 2025 Christopher Augustus
 #
 #   This Source Code Form is subject to the terms of the Mozilla Public
 #   License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,28 +12,30 @@
 
 # WORDY
 
-##arg-empty   (^ _ ==:)
-##ask-count   (* "countdown: " >$io.si)
-##to-int      (^ :i)
-##say-invalid (* "Invalid countdown "~_~", try again...\n" >*$io.sof)
-##get-count   (* arg-empty ? ask-count to-int ! (_1 say-invalid : </))
-##say-hello   (* _ "World, Hello..." >*$io.sof)
-##say-second  (* ~"..." >*$io.sof 1 >*$cc.sleep)
-##count-down  (* ..0 & (* _2 >*say-second))
-##say-bye-bye (* "Bye Bye.\n" >*$io.sof)
+count       = "count"
+down        = "down"
+countdown1  = "\(count)\(down): "
+countdown2  = (count~down~": ")
 
-##>*get-count
-##>*say-hello
-##>*count-down
-##>*say-bye-bye
+arg-empty   = (^ ==:)
+ask-count   = (> "countdown: " >$io.si)
+to-int      = (^ :i)
+say-invalid = (> "Invalid countdown "~_~", try again...\n" >$io.sof)
+get-count   = (> ^arg-empty ? >ask-count _ ^to-int ! (_1 >say-invalid : </))
+say-hello   = (> "World, Hello..." >$io.sof _)
+say-second  = (> ~"..." >$io.sof 1 >$cc.sleep)
+count-down  = (> _..0 & (> _2 >say-second))
+say-bye-bye = (> "Bye Bye.\n" >$io.sof)
+
+>get-count >say-hello >count-down >say-bye-bye
 
 # TACIT
 
-((^_==:) ? (* "countdown: " >*$io.si)
-  :i ! (* "Invalid countdown "~_1~", try again...\n" >*$io.sof () </))
-"World, Hello..." >*$io.sof
-..0 & (* _2~"..." >*$io.sof 1 >*$cc.sleep)
-"Bye Bye.\n" >*$io.sof
+==: ? ("countdown: " >$io.si) _
+:i ! ("Invalid countdown "~_1~", try again...\n" >$io.sof : </)
+("World, Hello..." >$io.sof)
+_..0 & (> _2~"..." >$io.sof 1 >$cc.sleep)
+"Bye Bye.\n" >$io.sof
 
 # GOLF
 
@@ -41,8 +43,8 @@
 
 #   L               F               R             operation
 
-#   arglist         >                             dyadic apply
-#   arglist         (                             expression begin
+#   arglist         >                             dyadic apply proc
+#   arglist         (                             declared expression begin
 #   arglist         ,               (^==())       dyadic append
 #   arglist,(^==()) ?_              >("count...   dyadic if instead
 #   arglist         (*                            monadic declare anon proc begin (0/true expression)
