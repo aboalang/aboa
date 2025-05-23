@@ -49,6 +49,8 @@ but now deviating quite far away from Lisps, with the following differences:
     aboa        Scheme            semantics
 
     #           ;                 comment
+    'symbol     'symbol           symbol literal
+    "..."       "..."             string literal
     _           argname           expression input argument reference, single list in aboa, one or more in Scheme
     _n          argname           nth list element of input argument reference
     /_          argname           expression input of previous scope, one level per /
@@ -58,11 +60,14 @@ but now deviating quite far away from Lisps, with the following differences:
     ^(...)      (...)             apply right function  expression (pure),      left to right
     >(...)      (...)             apply right procedure expression (effectful), left to right
     (...)       (...)             bounds of expression scope, applied when under active apply
-    name =      (define           bind right value: literal, func, proc
+    name =      (define           bind name to immutable right value: literal, func, proc
+    name =<     (define           bind name to mutable right value: literal, func, proc
     ^name                         apply bound function, its one argument comes from its left
     >name       (p ...)           apply bound procedure, in aboa its one argument comes from its left
     <)          (p ...)           tail recursion to beginning of expression
     /<)                           tail recursion outward one level per /
+
+    => name     (set! name        mutate variable
 
     ==          =                 equal             so it's 2 characters long like !=
     !=          !=                not equal
