@@ -7,6 +7,4 @@
 #   License, v. 2.0. If a copy of the MPL was not distributed with this
 #   file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
-"aboa> " >$io.si (
-  ^tx.tr ^tx.lc =| ("exit","quit","sair") ? :
-  (@ ! ("error: "~_2) >$io.sof //<))
+%a_%r1_(> "aboa> " >$io.si (^tx.tr ^tx.lc =| ("exit","quit","sair") ?/_ : (@ ! ("error: "~_2) >$io.sof //<)))

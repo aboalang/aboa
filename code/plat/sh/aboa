@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#   Copyright © 2024 Christopher Augustus
+#   Copyright © 2024 - 2025 Christopher Augustus
 #
 #   This Source Code Form is subject to the terms of the Mozilla Public
 #   License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,7 @@
 #
 
 # TODO: @@@ embed this source file in the final distribution of this file
-HERE=$(pwd)/$(dirname $0)
-ABOA=$(cat $HERE/../../core/repl.aboa)
-echo $ABOA
+AQUI=$(pwd)/$(dirname $0)
+ABOA=$(cat $AQUI/../../core/aboa.aboa)
+REPL=$(cat $AQUI/../../core/repl.aboa)
+echo $REPL
